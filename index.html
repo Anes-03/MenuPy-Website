@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MenuPy – macOS Menubar App | Under Construction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%);
+      margin: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .container {
+      background: rgba(0,0,0,0.35);
+      padding: 3em 2.5em;
+      border-radius: 22px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+      text-align: center;
+      max-width: 370px;
+    }
+    h1 {
+      font-size: 2.3em;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.2em;
+      font-family: 'Segoe UI Semibold', Arial, sans-serif;
+    }
+    .subtitle {
+      font-size: 1.09em;
+      color: #ffe;
+      margin-bottom: 1.3em;
+      opacity: 0.83;
+    }
+    p {
+      font-size: 1.18em;
+      opacity: 0.97;
+      margin-bottom: 2em;
+    }
+    .loader {
+      border: 6px solid #fff2;
+      border-top: 6px solid #fff;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 1em;
+      animation: spin 1.4s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    .note {
+      font-size: 0.97em;
+      color: #ffe;
+      opacity: 0.8;
+      margin-top: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="loader"></div>
+    <h1>MenuPy</h1>
+    <div class="subtitle">A macOS Menubar App</div>
+    <p>Our website is <b>under construction</b>.<br>
+      Stay tuned for something amazing for your Mac!</p>
+    <div class="note">© 2025 MenuPy. All rights reserved.</div>
+  </div>
+</body>
+</html>
