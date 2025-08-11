@@ -1,76 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>MenuPy – macOS Menubar App | Under Construction</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%);
-      margin: 0;
-      height: 100vh;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .container {
-      background: rgba(0,0,0,0.35);
-      padding: 3em 2.5em;
-      border-radius: 22px;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-      text-align: center;
-      max-width: 370px;
-    }
-    h1 {
-      font-size: 2.3em;
-      letter-spacing: 1.5px;
-      margin-bottom: 0.2em;
-      font-family: 'Segoe UI Semibold', Arial, sans-serif;
-    }
-    .subtitle {
-      font-size: 1.09em;
-      color: #ffe;
-      margin-bottom: 1.3em;
-      opacity: 0.83;
-    }
-    p {
-      font-size: 1.18em;
-      opacity: 0.97;
-      margin-bottom: 2em;
-    }
-    .loader {
-      border: 6px solid #fff2;
-      border-top: 6px solid #fff;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      margin: 0 auto 1em;
-      animation: spin 1.4s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-    .note {
-      font-size: 0.97em;
-      color: #ffe;
-      opacity: 0.8;
-      margin-top: 1.5em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MenuPy - macOS Menüleisten-App für Python-Skripte</title>
+    <meta name="description" content="MenuPy ist eine schlanke macOS Menüleisten-App zum schnellen Ausführen von Python-Skripten ohne Terminal.">
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="msapplication-TileColor" content="#007aff">
+    <meta name="theme-color" content="#007aff">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="loader"></div>
-    <h1>MenuPy</h1>
-    <div class="subtitle">A macOS Menubar App</div>
-    <p>Our website is <b>under construction</b>.<br>
-      Stay tuned for something amazing for your Mac!</p>
-    <div class="note">© 2025 MenuPy. All rights reserved.</div>
-  </div>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <div class="logo">
+                    <img src="App Icon (Logo).png" alt="MenuPy Logo" class="logo-img" draggable="false" oncontextmenu="return false;">
+                    <h1>MenuPy</h1>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#download">Download</a>
+                    <a href="#github" class="github-link">GitHub</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Python-Skripte mit einem Klick ausführen</h2>
+                    <p class="hero-subtitle">MenuPy ist eine schlanke macOS Menüleisten-App, um Python-Skripte schnell und ohne Terminal auszuführen.</p>
+                    <div class="hero-buttons">
+                        <a href="#download" class="btn btn-primary">Jetzt herunterladen</a>
+                        <a href="https://github.com/Anes-03/MenuPy" class="btn btn-secondary" target="_blank" rel="noopener">
+                            <span class="github-icon">⚡</span> GitHub Repository
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="App Icon (Logo).png" alt="MenuPy App Icon" class="app-icon" draggable="false" oncontextmenu="return false;">
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2>Kernfunktionen</h2>
+                <div class="features-grid">
+                    <div class="feature">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Ein-Klick-Ausführung</h3>
+                        <p>Starte Python-Skripte direkt aus der Menüleiste - ohne Terminal und ohne komplexe UI.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📁</div>
+                        <h3>Flexible Skriptverwaltung</h3>
+                        <p>Verwalte Skripte aus Ordnern oder füge einzelne .py-Dateien hinzu - ganz nach deinen Bedürfnissen.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🐍</div>
+                        <h3>Python-Interpreter-Auswahl</h3>
+                        <p>Unterstützt Homebrew, pyenv, System-Python und benutzerdefinierte Interpreter.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">⚙️</div>
+                        <h3>Anpassbares Icon</h3>
+                        <p>Personalisiere dein Menüleisten-Icon mit eigenen Bildern oder SF-Symbolen.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Prozessverwaltung</h3>
+                        <p>Überwache laufende Skripte und beende sie einzeln oder alle auf einmal.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🏷️</div>
+                        <h3>Badge-Anzeige</h3>
+                        <p>Optional: Badge mit der Anzahl laufender Skripte in der Menüleiste.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="use-cases">
+            <div class="container">
+                <h2>Typische Anwendungsfälle</h2>
+                <div class="use-cases-grid">
+                    <div class="use-case">
+                        <h3>Für Entwickler</h3>
+                        <ul>
+                            <li>Build-Hilfen und Deployment-Snippets</li>
+                            <li>Repository-Cleanup-Skripte</li>
+                            <li>Admin-Tasks und Automatisierungen</li>
+                        </ul>
+                    </div>
+                    <div class="use-case">
+                        <h3>Für alle Benutzer</h3>
+                        <ul>
+                            <li>Datenexport (CSV/Excel generieren)</li>
+                            <li>Backup-Skripte triggern</li>
+                            <li>Alltägliche Automatisierungen</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="download" class="download">
+            <div class="container">
+                <h2>Download MenuPy</h2>
+                <p>Lade die neueste Version von MenuPy für macOS herunter:</p>
+                <div class="download-options">
+                    <a href="https://github.com/Anes-03/MenuPy/releases/download/v1.0/MenuPy-1.0.dmg" class="btn btn-download" download>
+                        <svg class="download-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C13.1 2 14 2.9 14 4V12.17L15.59 10.59L17 12L12 17L7 12L8.41 10.59L10 12.17V4C10 2.9 10.9 2 12 2ZM21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15C3 13.9 3.9 13 5 13H7V15H5V19H19V15H17V13H19C20.1 13 21 13.9 21 15Z"/>
+                        </svg>
+                        MenuPy.dmg herunterladen
+                    </a>
+                    <div class="download-info">
+                        <p><strong>Systemanforderungen:</strong> macOS 13 oder neuer</p>
+                        <p><strong>Größe:</strong> ~311 KB</p>
+                        <p><strong>Lizenz:</strong> Open Source</p>
+                    </div>
+                </div>
+                <div class="installation-note">
+                    <h3>Installation</h3>
+                    <p>1. Lade die .dmg-Datei herunter</p>
+                    <p>2. Öffne die .dmg-Datei und ziehe MenuPy in den Programme-Ordner</p>
+                    <p>3. Starte MenuPy - es erscheint ein Icon in der Menüleiste</p>
+                    <p><em>Hinweis: Bei der ersten Verwendung musst du möglicherweise "Trotzdem öffnen" in den Systemeinstellungen wählen.</em></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="github" class="github-section">
+            <div class="container">
+                <h2>Open Source auf GitHub</h2>
+                <p>MenuPy ist ein Open-Source-Projekt. Du findest den kompletten Quellcode, Dokumentation und kannst Issues melden oder Beiträge leisten:</p>
+                <div class="github-links">
+                    <a href="https://github.com/Anes-03/MenuPy" class="btn btn-github" target="_blank" rel="noopener">
+                        <span class="github-icon">📦</span>
+                        GitHub Repository besuchen
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="additional-links">
+            <div class="container">
+                <div class="additional-links-grid">
+                    <a href="https://github.com/Anes-03/MenuPy/releases" class="btn btn-outline" target="_blank" rel="noopener">
+                        <span class="releases-icon">🏷️</span>
+                        Alle Releases anzeigen
+                    </a>
+                    <a href="https://github.com/Anes-03/MenuPy/issues" class="btn btn-outline" target="_blank" rel="noopener">
+                        <span class="issues-icon">🐛</span>
+                        Issues & Feedback
+                    </a>
+                    <a href="https://github.com/Anes-03/MenuPy/wiki" class="btn btn-outline" target="_blank" rel="noopener">
+                        <span class="wiki-icon">📚</span>
+                        Dokumentation
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 MenuPy. Kostenlos und Open Source verfügbar.</p>
+            <p>Eine schlanke Lösung für Python-Automatisierung auf macOS</p>
+        </div>
+    </footer>
 </body>
 </html>
