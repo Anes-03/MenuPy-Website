@@ -15,6 +15,16 @@
     --border-color: #e5e5e7;
     --shadow-color: rgba(0, 0, 0, 0.08);
     --nav-bg: rgba(255, 255, 255, 0.95);
+    --primary: #007aff;
+    --primary-600: #1769ff;
+    --primary-700: #0056cc;
+    --success: #34c759;
+    --success-700: #28a745;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 8px 24px rgba(0,0,0,.12);
+    --shadow-lg: 0 20px 40px rgba(0,0,0,.18);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,8 +37,12 @@
         --text-secondary: #98989d;
         --border-color: #38383a;
         --shadow-color: rgba(0, 0, 0, 0.3);
-        --nav-bg: rgba(44, 44, 46, 0.95);
+        --nav-bg: rgba(44, 44, 46, 0.75);
     }
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -37,6 +51,8 @@ body {
     color: var(--text-primary);
     background-color: var(--bg-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -44,6 +60,9 @@ body {
     margin: 0 auto;
     padding: 0 20px;
 }
+
+/* Anchor target offset for sticky header */
+[id] { scroll-margin-top: 90px; }
 
 /* Prevent image copying and dragging */
 img {
@@ -68,6 +87,7 @@ img {
 header {
     background: var(--nav-bg);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
@@ -92,12 +112,13 @@ header {
 }
 
 .logo-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
 }
 
-.logo h1 {
+.logo .logo-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -117,11 +138,10 @@ header {
     display: flex;
     align-items: center;
     height: 40px;
+    padding: 0 .25rem;
 }
 
-.nav-links a:hover {
-    color: #007aff;
-}
+.nav-links a:hover { color: var(--primary); }
 
 .github-link {
     background: #24292e;
@@ -129,6 +149,7 @@ header {
     padding: 0.5rem 1rem;
     border-radius: 8px;
     transition: background 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .github-link:hover {
@@ -136,11 +157,20 @@ header {
     color: white !important;
 }
 
+/* Focus styles */
+:where(a, button, .btn):focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--primary), white 20%);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: radial-gradient(1200px 500px at -10% 0%, rgba(255,255,255,.12), transparent 60%),
+                radial-gradient(1000px 600px at 110% -10%, rgba(255,255,255,.10), transparent 60%),
+                linear-gradient(135deg, #6366f1 0%, #7c3aed 35%, #0ea5e9 100%);
     color: white;
-    padding: 4rem 0;
+    padding: 5rem 0 4rem;
 }
 
 .hero-content {
@@ -154,7 +184,7 @@ header {
     gap: 3rem;
 }
 
-.hero h2 {
+.hero h1 {
     font-size: 3rem;
     font-weight: 700;
     line-height: 1.2;
@@ -163,7 +193,7 @@ header {
 
 .hero-subtitle {
     font-size: 1.25rem;
-    opacity: 0.9;
+    opacity: 0.95;
     margin-bottom: 2rem;
     line-height: 1.5;
 }
@@ -179,10 +209,11 @@ header {
 }
 
 .app-icon {
-    width: 200px;
-    height: 200px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: 220px;
+    height: 220px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255,255,255,0.25);
 }
 
 /* Buttons */
@@ -192,46 +223,28 @@ header {
     gap: 0.5rem;
     padding: 0.875rem 1.5rem;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-weight: 600;
     transition: all 0.2s ease;
     cursor: pointer;
     border: none;
     font-size: 1rem;
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-primary {
-    background: #007aff;
-    color: white;
-}
+.btn-primary { background: var(--primary); background: linear-gradient(180deg, color-mix(in oklab, var(--primary), white 10%), var(--primary)); color: white; }
 
-.btn-primary:hover {
-    background: #0056cc;
-    transform: translateY(-1px);
-}
+.btn-primary:hover { background: var(--primary-700); transform: translateY(-1px); }
 
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
+.btn-secondary { background: rgba(255, 255, 255, 0.18); color: white; border: 1px solid rgba(255, 255, 255, 0.3); }
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
-.btn-download {
-    background: #34c759;
-    color: white;
-    font-size: 1.125rem;
-    padding: 1rem 2rem;
-}
+.btn-download { background: var(--success); background: linear-gradient(180deg, color-mix(in oklab, var(--success), white 10%), var(--success)); color: white; font-size: 1.125rem; padding: 1rem 2rem; }
 
-.btn-download:hover {
-    background: #28a745;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(52, 199, 89, 0.3);
-}
+.btn-download:hover { background: var(--success-700); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52, 199, 89, 0.3); }
 
 .download-icon {
     margin-right: 0.5rem;
@@ -252,10 +265,7 @@ header {
 }
 
 /* Features Section */
-.features {
-    padding: 5rem 0;
-    background: var(--bg-secondary);
-}
+.features { padding: 5.5rem 0; background: var(--bg-secondary); }
 
 .features h2 {
     text-align: center;
@@ -271,22 +281,11 @@ header {
     gap: 2rem;
 }
 
-.feature {
-    text-align: center;
-    padding: 2rem;
-    border-radius: 16px;
-    background: var(--bg-tertiary);
-    transition: transform 0.2s ease;
-}
+.feature { text-align: center; padding: 2rem; border-radius: var(--radius-lg); background: var(--bg-tertiary); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease; }
 
-.feature:hover {
-    transform: translateY(-4px);
-}
+.feature:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
 
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
+.feature-icon { font-size: 2rem; margin: 0 auto 1rem; width: 56px; height: 56px; display: grid; place-items: center; color: var(--primary); background: rgba(0,122,255,0.12); background: color-mix(in oklab, var(--primary), white 85%); border: 1px solid rgba(0,122,255,0.24); border: 1px solid color-mix(in oklab, var(--primary), white 70%); border-radius: 14px; }
 
 .feature h3 {
     font-size: 1.5rem;
@@ -301,10 +300,7 @@ header {
 }
 
 /* Use Cases Section */
-.use-cases {
-    padding: 5rem 0;
-    background: var(--bg-tertiary);
-}
+.use-cases { padding: 5.5rem 0; background: var(--bg-tertiary); }
 
 .use-cases h2 {
     text-align: center;
@@ -320,12 +316,7 @@ header {
     gap: 3rem;
 }
 
-.use-case {
-    background: var(--bg-secondary);
-    padding: 2.5rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px var(--shadow-color);
-}
+.use-case { background: var(--bg-secondary); padding: 2.25rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease; }
 
 .use-case h3 {
     font-size: 1.5rem;
@@ -345,20 +336,10 @@ header {
     color: var(--text-secondary);
 }
 
-.use-case li:before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    color: #34c759;
-    font-weight: bold;
-}
+.use-case li:before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: bold; }
 
 /* Download Section */
-.download {
-    padding: 5rem 0;
-    background: var(--bg-secondary);
-    text-align: center;
-}
+.download { padding: 5.5rem 0; background: var(--bg-secondary); text-align: center; }
 
 .download h2 {
     font-size: 2.5rem;
@@ -373,9 +354,7 @@ header {
     margin-bottom: 3rem;
 }
 
-.download-options {
-    margin-bottom: 3rem;
-}
+.download-options { margin-bottom: 3rem; display: grid; place-items: center; }
 
 .download-info {
     margin-top: 2rem;
@@ -417,11 +396,7 @@ header {
 }
 
 /* GitHub Section */
-.github-section {
-    padding: 5rem 0;
-    background: var(--bg-tertiary);
-    text-align: center;
-}
+.github-section { padding: 5.5rem 0; background: var(--bg-tertiary); text-align: center; }
 
 .github-section h2 {
     font-size: 2.5rem;
@@ -447,11 +422,7 @@ header {
 }
 
 /* Additional Links Section */
-.additional-links {
-    padding: 3rem 0;
-    background: var(--bg-secondary);
-    text-align: center;
-}
+.additional-links { padding: 3.5rem 0; background: var(--bg-secondary); text-align: center; }
 
 .additional-links-grid {
     display: flex;
@@ -465,6 +436,7 @@ header {
     color: var(--text-primary);
     border: 2px solid var(--border-color);
     transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-outline:hover {
@@ -493,14 +465,9 @@ footer p {
         text-align: center;
     }
     
-    .hero h2 {
-        font-size: 2.5rem;
-    }
+    .hero h1 { font-size: 2.25rem; }
     
-    .app-icon {
-        width: 150px;
-        height: 150px;
-    }
+    .app-icon { width: 160px; height: 160px; }
     
     .nav-container {
         flex-direction: column;
@@ -536,9 +503,7 @@ footer p {
 }
 
 @media (max-width: 480px) {
-    .hero h2 {
-        font-size: 2rem;
-    }
+    .hero h1 { font-size: 1.85rem; }
     
     .features h2,
     .use-cases h2,
@@ -550,4 +515,10 @@ footer p {
     .container {
         padding: 0 15px;
     }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    .feature:hover, .use-case:hover, .btn-download:hover, .btn-primary:hover { transform: none !important; }
 }
