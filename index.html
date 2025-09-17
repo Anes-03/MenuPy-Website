@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MenuPy - macOS Menüleisten-App für Python-Skripte</title>
     <meta name="description" content="MenuPy ist eine schlanke macOS Menüleisten-App zum schnellen Ausführen von Python-Skripten ohne Terminal.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://menupy.252425.xyz/">
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://menupy.252425.xyz/">
+    <meta property="og:title" content="MenuPy - macOS Menüleisten-App für Python-Skripte">
+    <meta property="og:description" content="Python-Skripte aus der Menüleiste mit einem Klick ausführen. Unterstützt Ordner, .py-Dateien, mehrere Interpreter und mehr.">
+    <meta property="og:image" content="https://menupy.252425.xyz/android-chrome-512x512.png">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:site_name" content="MenuPy">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MenuPy - macOS Menüleisten-App">
+    <meta name="twitter:description" content="Schnell Python-Skripte ausführen – direkt aus der Menüleiste.">
+    <meta name="twitter:image" content="https://menupy.252425.xyz/android-chrome-512x512.png">
+    <link rel="preconnect" href="https://api.github.com">
     
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -13,6 +28,7 @@
     <link rel="shortcut icon" href="favicon.ico">
     <meta name="msapplication-TileColor" content="#007aff">
     <meta name="theme-color" content="#007aff">
+    <link rel="manifest" href="site.webmanifest">
     
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,8 +37,8 @@
         <nav>
             <div class="nav-container">
                 <div class="logo">
-                    <img src="App Icon (Logo).png" alt="MenuPy Logo" class="logo-img" draggable="false" oncontextmenu="return false;">
-                    <h1>MenuPy</h1>
+                    <img src="App Icon (Logo).png" alt="MenuPy Logo" class="logo-img" width="36" height="36" draggable="false" oncontextmenu="return false;">
+                    <span class="logo-title">MenuPy</span>
                 </div>
                 <div class="nav-links">
                     <a href="#features">Features</a>
@@ -37,7 +53,7 @@
         <section class="hero">
             <div class="container">
                 <div class="hero-content">
-                    <h2>Python-Skripte mit einem Klick ausführen</h2>
+                    <h1>Python-Skripte mit einem Klick ausführen</h1>
                     <p class="hero-subtitle">MenuPy ist eine schlanke macOS Menüleisten-App, um Python-Skripte schnell und ohne Terminal auszuführen.</p>
                     <div class="hero-buttons">
                         <a href="#download" class="btn btn-primary">Jetzt herunterladen</a>
@@ -47,7 +63,7 @@
                     </div>
                 </div>
                 <div class="hero-image">
-                    <img src="App Icon (Logo).png" alt="MenuPy App Icon" class="app-icon" draggable="false" oncontextmenu="return false;">
+                    <img src="App Icon (Logo).png" alt="MenuPy App Icon" class="app-icon" width="220" height="220" draggable="false" oncontextmenu="return false;">
                 </div>
             </div>
         </section>
@@ -119,18 +135,27 @@
                 <h2>Download MenuPy</h2>
                 <p>Lade die neueste Version von MenuPy für macOS herunter:</p>
                 <div class="download-options">
-                    <a href="https://github.com/Anes-03/MenuPy/releases/download/v1.0/MenuPy-1.0.dmg" class="btn btn-download" download>
+                    <!-- Fallback goes to the releases page; JS will replace with latest .dmg URL -->
+                    <a id="download-button" href="https://github.com/Anes-03/MenuPy/releases/latest" class="btn btn-download" aria-label="Neueste MenuPy Version herunterladen">
                         <svg class="download-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C13.1 2 14 2.9 14 4V12.17L15.59 10.59L17 12L12 17L7 12L8.41 10.59L10 12.17V4C10 2.9 10.9 2 12 2ZM21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15C3 13.9 3.9 13 5 13H7V15H5V19H19V15H17V13H19C20.1 13 21 13.9 21 15Z"/>
                         </svg>
                         MenuPy.dmg herunterladen
                     </a>
+                    <div id="download-meta" class="download-meta" aria-live="polite" style="margin-top:0.75rem; color: var(--text-secondary);">
+                        <span>Neueste Version: <strong id="download-version">wird geladen…</strong></span>
+                        <span style="margin: 0 0.5rem;">•</span>
+                        <span>Größe: <strong id="download-size">–</strong></span>
+                    </div>
                     <div class="download-info">
                         <p><strong>Systemanforderungen:</strong> macOS 13 oder neuer</p>
-                        <p><strong>Größe:</strong> ~311 KB</p>
+                        <p><strong>Architektur:</strong> Universal (Apple Silicon/Intel) sofern angegeben</p>
                         <p><strong>Lizenz:</strong> Open Source</p>
                     </div>
                 </div>
+                <noscript>
+                    <p>Hinweis: JavaScript ist deaktiviert. Der Download-Button führt zur Übersicht der Releases. Wähle dort die neueste .dmg aus.</p>
+                </noscript>
                 <div class="installation-note">
                     <h3>Installation</h3>
                     <p>1. Lade die .dmg-Datei herunter</p>
@@ -180,5 +205,54 @@
             <p>Eine schlanke Lösung für Python-Automatisierung auf macOS</p>
         </div>
     </footer>
+    <!-- Structured data for better discoverability -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MenuPy",
+      "operatingSystem": "macOS 13+",
+      "applicationCategory": "DeveloperApplication",
+      "description": "MenuPy ist eine schlanke macOS Menüleisten-App, um Python-Skripte schnell und ohne Terminal auszuführen.",
+      "url": "https://menupy.252425.xyz/",
+      "downloadUrl": "https://github.com/Anes-03/MenuPy/releases/latest",
+      "image": "https://menupy.252425.xyz/android-chrome-512x512.png",
+      "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}
+    }
+    </script>
+    <script>
+        (async function updateDownloadLink() {
+            try {
+                const btn = document.getElementById('download-button');
+                const verEl = document.getElementById('download-version');
+                const sizeEl = document.getElementById('download-size');
+                if (!btn) return;
+                const res = await fetch('https://api.github.com/repos/Anes-03/MenuPy/releases/latest', {
+                    headers: { 'Accept': 'application/vnd.github+json' }
+                });
+                if (!res.ok) return; // Fallback link remains
+                const data = await res.json();
+                if (!data || !Array.isArray(data.assets)) return;
+                // Prefer a macOS DMG asset
+                const asset = data.assets.find(a => typeof a.name === 'string' && a.name.toLowerCase().endsWith('.dmg'))
+                            || data.assets[0];
+                if (asset && asset.browser_download_url) {
+                    btn.href = asset.browser_download_url;
+                    btn.setAttribute('download', '');
+                }
+                const tag = data.tag_name || data.name;
+                if (verEl && tag) verEl.textContent = tag;
+                if (sizeEl && asset && typeof asset.size === 'number') {
+                    const bytes = asset.size;
+                    const formatted = bytes > 1024 * 1024
+                      ? (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+                      : Math.ceil(bytes / 1024) + ' KB';
+                    sizeEl.textContent = formatted;
+                }
+            } catch (_) {
+                // Ignore errors; fallback link to releases page stays usable
+            }
+        })();
+    </script>
 </body>
 </html>
