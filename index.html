@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MenuPy - macOS Menüleisten-App für Python-Skripte</title>
-    <meta name="description" content="MenuPy ist eine schlanke macOS Menüleisten-App zum schnellen Ausführen von Python-Skripten ohne Terminal.">
+    <meta name="description"
+        content="MenuPy ist eine schlanke macOS Menüleisten-App zum schnellen Ausführen von Python-Skripten ohne Terminal.">
     <meta name="robots" content="index,follow">
     <link rel="canonical" href="https://menupy.252425.xyz/">
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://menupy.252425.xyz/">
     <meta property="og:title" content="MenuPy - macOS Menüleisten-App für Python-Skripte">
-    <meta property="og:description" content="Python-Skripte aus der Menüleiste mit einem Klick ausführen. Unterstützt Ordner, .py-Dateien, mehrere Interpreter und mehr.">
+    <meta property="og:description"
+        content="Python-Skripte aus der Menüleiste mit einem Klick ausführen. Unterstützt Ordner, .py-Dateien, mehrere Interpreter und mehr.">
     <meta property="og:image" content="https://menupy.252425.xyz/android-chrome-512x512.png">
     <meta property="og:locale" content="de_DE">
     <meta property="og:site_name" content="MenuPy">
@@ -20,7 +23,7 @@
     <meta name="twitter:description" content="Schnell Python-Skripte ausführen – direkt aus der Menüleiste.">
     <meta name="twitter:image" content="https://menupy.252425.xyz/android-chrome-512x512.png">
     <link rel="preconnect" href="https://api.github.com">
-    
+
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -29,21 +32,59 @@
     <meta name="msapplication-TileColor" content="#007aff">
     <meta name="theme-color" content="#007aff">
     <link rel="manifest" href="site.webmanifest">
-    
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header>
         <nav>
             <div class="nav-container">
                 <div class="logo">
-                    <img src="App Icon (Logo).png" alt="MenuPy Logo" class="logo-img" width="36" height="36" draggable="false" oncontextmenu="return false;">
+                    <img src="App Icon (Logo).png" alt="MenuPy Logo" class="logo-img" width="36" height="36"
+                        draggable="false" oncontextmenu="return false;">
                     <span class="logo-title">MenuPy</span>
                 </div>
                 <div class="nav-links">
-                    <a href="#features">Features</a>
-                    <a href="#download">Download</a>
-                    <a href="#github" class="github-link">GitHub</a>
+                    <a href="#features">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icon">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        Features
+                    </a>
+                    <a href="#download">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icon">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </a>
+                    <a href="https://github.com/Anes-03/MenuPy" class="github-link" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icon">
+                            <path
+                                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                            </path>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="scripts.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icon">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Skripte
+                    </a>
                 </div>
             </div>
         </nav>
@@ -51,19 +92,48 @@
 
     <main>
         <section class="hero">
+            <div class="hero-mesh-container">
+                <div class="mesh-blob mesh-1"></div>
+                <div class="mesh-blob mesh-2"></div>
+                <div class="mesh-blob mesh-3"></div>
+            </div>
             <div class="container">
                 <div class="hero-content">
-                    <h1>Python-Skripte mit einem Klick ausführen</h1>
-                    <p class="hero-subtitle">MenuPy ist eine schlanke macOS Menüleisten-App, um Python-Skripte schnell und ohne Terminal auszuführen.</p>
+                    <div class="hero-eyebrow"
+                        style="color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.85rem; margin-bottom: 1.25rem; opacity: 0.9;">
+                        252425 HOMELAB</div>
+                    <h1>Python-Skripte mit <span class="text-gradient">einem Klick</span> ausführen</h1>
+                    <p class="hero-subtitle">MenuPy ist eine schlanke macOS Menüleisten-App, mit der du deine
+                        Lieblings-Automatisierungen blitzschnell ausführst.</p>
                     <div class="hero-buttons">
-                        <a href="#download" class="btn btn-primary">Jetzt herunterladen</a>
-                        <a href="https://github.com/Anes-03/MenuPy" class="btn btn-secondary" target="_blank" rel="noopener">
-                            <span class="github-icon">⚡</span> GitHub Repository
+                        <a href="#download" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round" style="margin-right: 8px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Jetzt laden
+                        </a>
+                        <a href="https://github.com/Anes-03/MenuPy" class="btn btn-secondary" target="_blank"
+                            rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" style="margin-right: 8px;">
+                                <path
+                                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                                </path>
+                            </svg>
+                            Repository
                         </a>
                     </div>
                 </div>
                 <div class="hero-image">
-                    <img src="App Icon (Logo).png" alt="MenuPy App Icon" class="app-icon" width="220" height="220" draggable="false" oncontextmenu="return false;">
+                    <div class="icon-wrapper">
+                        <img src="App Icon (Logo).png" alt="MenuPy App Icon" class="app-icon" width="220" height="220"
+                            draggable="false" oncontextmenu="return false;">
+                    </div>
                 </div>
             </div>
         </section>
@@ -73,35 +143,142 @@
                 <h2>Kernfunktionen</h2>
                 <div class="features-grid">
                     <div class="feature">
-                        <div class="feature-icon">🚀</div>
+                        <div class="feature-icon feature-run">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-rocket">
+                                <path
+                                    d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                                <path
+                                    d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+                            </svg>
+                        </div>
                         <h3>Ein-Klick-Ausführung</h3>
                         <p>Starte Python-Skripte direkt aus der Menüleiste - ohne Terminal und ohne komplexe UI.</p>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">📁</div>
+                        <div class="feature-icon feature-folder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-folder-root">
+                                <path
+                                    d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                                <path d="M12 10v4" />
+                                <path d="M10 12h4" />
+                            </svg>
+                        </div>
                         <h3>Flexible Skriptverwaltung</h3>
-                        <p>Verwalte Skripte aus Ordnern oder füge einzelne .py-Dateien hinzu - ganz nach deinen Bedürfnissen.</p>
+                        <p>Verwalte Skripte aus Ordnern oder füge einzelne .py-Dateien hinzu - ganz nach deinen
+                            Bedürfnissen.</p>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">🐍</div>
+                        <div class="feature-icon feature-interpreter">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-cpu">
+                                <rect width="16" height="16" x="4" y="4" rx="2" />
+                                <rect width="6" height="6" x="9" y="9" rx="1" />
+                                <path d="M15 2v2" />
+                                <path d="M15 20v2" />
+                                <path d="M2 15h2" />
+                                <path d="M2 9h2" />
+                                <path d="M20 15h2" />
+                                <path d="M20 9h2" />
+                                <path d="M9 2v2" />
+                                <path d="M9 20v2" />
+                            </svg>
+                        </div>
                         <h3>Python-Interpreter-Auswahl</h3>
                         <p>Unterstützt Homebrew, pyenv, System-Python und benutzerdefinierte Interpreter.</p>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">⚙️</div>
+                        <div class="feature-icon feature-custom">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-palette">
+                                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+                                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+                                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+                                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+                                <path
+                                    d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.67-.75 1.67-1.67 0-.4-.15-.78-.42-1.08-.27-.3-.44-.71-.44-1.15 0-.92.75-1.67 1.67-1.67H16c3.3 0 6-2.7 6-6 0-4.96-4.44-9-10-9z" />
+                            </svg>
+                        </div>
                         <h3>Anpassbares Icon</h3>
                         <p>Personalisiere dein Menüleisten-Icon mit eigenen Bildern oder SF-Symbolen.</p>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">🔄</div>
+                        <div class="feature-icon feature-process">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-activity">
+                                <path
+                                    d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2" />
+                            </svg>
+                        </div>
                         <h3>Prozessverwaltung</h3>
                         <p>Überwache laufende Skripte und beende sie einzeln oder alle auf einmal.</p>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">🏷️</div>
+                        <div class="feature-icon feature-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-bell-ring">
+                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
+                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
+                            </svg>
+                        </div>
                         <h3>Badge-Anzeige</h3>
                         <p>Optional: Badge mit der Anzahl laufender Skripte in der Menüleiste.</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="popular-scripts" class="popular-scripts">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Beliebte Skripte</h2>
+                    <p>Entdecke nützliche Automatisierungen aus unserer Sammlung.</p>
+                </div>
+                <div class="scripts-preview-grid">
+                    <div class="script-card">
+                        <div class="script-badge">System</div>
+                        <h3>Downloads aufräumen</h3>
+                        <p>Sortiert alte Dateien in ~/Downloads automatisch nach Typ und Datum, um Ordnung zu halten.
+                        </p>
+                        <div class="script-footer">
+                            <span class="python-version">Python 3.10+</span>
+                            <a href="scripts.html#downloads_sorter" class="script-link">Details →</a>
+                        </div>
+                    </div>
+                    <div class="script-card">
+                        <div class="script-badge">Medien</div>
+                        <h3>Screenshot OCR</h3>
+                        <p>Nimmt einen Screenshot auf, erkennt Text via Tesseract und kopiert ihn direkt ins Clipboard.
+                        </p>
+                        <div class="script-footer">
+                            <span class="python-version">Python 3.10+</span>
+                            <a href="scripts.html#screenshot_ocr" class="script-link">Details →</a>
+                        </div>
+                    </div>
+                    <div class="script-card">
+                        <div class="script-badge">Ollama</div>
+                        <h3>Clipboard Summary</h3>
+                        <p>Fasst den aktuellen Clipboard-Text mithilfe von Ollama (Llama 3.1) in Stichpunkten zusammen.
+                        </p>
+                        <div class="script-footer">
+                            <span class="python-version">Python 3.10+</span>
+                            <a href="scripts.html#ollama_clipboard_summary" class="script-link">Details →</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="view-all-container">
+                    <a href="scripts.html" class="btn btn-outline">Alle Skripte durchsuchen</a>
                 </div>
             </div>
         </section>
@@ -113,17 +290,33 @@
                     <div class="use-case">
                         <h3>Für Entwickler</h3>
                         <ul>
-                            <li>Build-Hilfen und Deployment-Snippets</li>
-                            <li>Repository-Cleanup-Skripte</li>
-                            <li>Admin-Tasks und Automatisierungen</li>
+                            <li>API-Tests und schnelle Debug-Requests</li>
+                            <li>Docker-Container Management (Start/Stop)</li>
+                            <li>Deployment-Workflows triggern</li>
                         </ul>
                     </div>
                     <div class="use-case">
-                        <h3>Für alle Benutzer</h3>
+                        <h3>Für Daten-Enthusiasten</h3>
                         <ul>
-                            <li>Datenexport (CSV/Excel generieren)</li>
-                            <li>Backup-Skripte triggern</li>
-                            <li>Alltägliche Automatisierungen</li>
+                            <li>Automatisierter Daten-Export (API/DB)</li>
+                            <li>Schnelle CSV/JSON Konvertierungen</li>
+                            <li>Dashboard-Refresh-Skripte triggern</li>
+                        </ul>
+                    </div>
+                    <div class="use-case">
+                        <h3>Für Creator & Büro</h3>
+                        <ul>
+                            <li>Bild-Batch-Processing (Resize/Watermark)</li>
+                            <li>KI-Tools (Summary, Transkription)</li>
+                            <li>PDF-Management (Merge/Extract)</li>
+                        </ul>
+                    </div>
+                    <div class="use-case">
+                        <h3>System-Management</h3>
+                        <ul>
+                            <li>Cleanup-Tasks (Downloads, Cache)</li>
+                            <li>Monitor-Steuerung & Profile wechseln</li>
+                            <li>Backup-Validierung & Synchronisation</li>
                         </ul>
                     </div>
                 </div>
@@ -132,17 +325,28 @@
 
         <section id="download" class="download">
             <div class="container">
+                <div class="installation-note">
+                    <h3>Installation</h3>
+                    <p>1. Lade die .dmg-Datei herunter</p>
+                    <p>2. Öffne die .dmg-Datei und ziehe MenuPy in den Programme-Ordner</p>
+                    <p>3. Starte MenuPy - es erscheint ein Icon in der Menüleiste</p>
+                    <p><em>Hinweis: Bei der ersten Verwendung musst du möglicherweise "Trotzdem öffnen" in den
+                            Systemeinstellungen wählen.</em></p>
+                </div>
                 <h2>Download MenuPy</h2>
                 <p>Lade die neueste Version von MenuPy für macOS herunter:</p>
                 <div class="download-options">
                     <!-- Fallback goes to the releases page; JS will replace with latest .dmg URL -->
-                    <a id="download-button" href="https://github.com/Anes-03/MenuPy/releases/latest" class="btn btn-download" aria-label="Neueste MenuPy Version herunterladen">
+                    <a id="download-button" href="https://github.com/Anes-03/MenuPy/releases/latest"
+                        class="btn btn-download" aria-label="Neueste MenuPy Version herunterladen">
                         <svg class="download-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C13.1 2 14 2.9 14 4V12.17L15.59 10.59L17 12L12 17L7 12L8.41 10.59L10 12.17V4C10 2.9 10.9 2 12 2ZM21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15C3 13.9 3.9 13 5 13H7V15H5V19H19V15H17V13H19C20.1 13 21 13.9 21 15Z"/>
+                            <path
+                                d="M12 2C13.1 2 14 2.9 14 4V12.17L15.59 10.59L17 12L12 17L7 12L8.41 10.59L10 12.17V4C10 2.9 10.9 2 12 2ZM21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15C3 13.9 3.9 13 5 13H7V15H5V19H19V15H17V13H19C20.1 13 21 13.9 21 15Z" />
                         </svg>
                         MenuPy.dmg herunterladen
                     </a>
-                    <div id="download-meta" class="download-meta" aria-live="polite" style="margin-top:0.75rem; color: var(--text-secondary);">
+                    <div id="download-meta" class="download-meta" aria-live="polite"
+                        style="margin-top:0.75rem; color: var(--text-secondary);">
                         <span>Neueste Version: <strong id="download-version">wird geladen…</strong></span>
                         <span style="margin: 0 0.5rem;">•</span>
                         <span>Größe: <strong id="download-size">–</strong></span>
@@ -154,25 +358,26 @@
                     </div>
                 </div>
                 <noscript>
-                    <p>Hinweis: JavaScript ist deaktiviert. Der Download-Button führt zur Übersicht der Releases. Wähle dort die neueste .dmg aus.</p>
+                    <p>Hinweis: JavaScript ist deaktiviert. Der Download-Button führt zur Übersicht der Releases. Wähle
+                        dort die neueste .dmg aus.</p>
                 </noscript>
-                <div class="installation-note">
-                    <h3>Installation</h3>
-                    <p>1. Lade die .dmg-Datei herunter</p>
-                    <p>2. Öffne die .dmg-Datei und ziehe MenuPy in den Programme-Ordner</p>
-                    <p>3. Starte MenuPy - es erscheint ein Icon in der Menüleiste</p>
-                    <p><em>Hinweis: Bei der ersten Verwendung musst du möglicherweise "Trotzdem öffnen" in den Systemeinstellungen wählen.</em></p>
-                </div>
             </div>
         </section>
 
         <section id="github" class="github-section">
             <div class="container">
                 <h2>Open Source auf GitHub</h2>
-                <p>MenuPy ist ein Open-Source-Projekt. Du findest den kompletten Quellcode, Dokumentation und kannst Issues melden oder Beiträge leisten:</p>
+                <p>MenuPy ist ein Open-Source-Projekt. Du findest den kompletten Quellcode, Dokumentation und kannst
+                    Issues melden oder Beiträge leisten:</p>
                 <div class="github-links">
                     <a href="https://github.com/Anes-03/MenuPy" class="btn btn-github" target="_blank" rel="noopener">
-                        <span class="github-icon">📦</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 8px;">
+                            <path
+                                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                            </path>
+                        </svg>
                         GitHub Repository besuchen
                     </a>
                 </div>
@@ -182,16 +387,41 @@
         <section class="additional-links">
             <div class="container">
                 <div class="additional-links-grid">
-                    <a href="https://github.com/Anes-03/MenuPy/releases" class="btn btn-outline" target="_blank" rel="noopener">
-                        <span class="releases-icon">🏷️</span>
+                    <a href="https://github.com/Anes-03/MenuPy/releases" class="btn btn-outline" target="_blank"
+                        rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 8px;">
+                            <path d="M12 2H2v10l9.29 9.29c.39.39 1.02.39 1.41 0l8.59-8.59c.39-.39.39-1.02 0-1.41L12 2z">
+                            </path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
                         Alle Releases anzeigen
                     </a>
-                    <a href="https://github.com/Anes-03/MenuPy/issues" class="btn btn-outline" target="_blank" rel="noopener">
-                        <span class="issues-icon">🐛</span>
+                    <a href="https://github.com/Anes-03/MenuPy/issues" class="btn btn-outline" target="_blank"
+                        rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 8px;">
+                            <path d="M8 2 10 2"></path>
+                            <path d="M14 2 16 2"></path>
+                            <path d="M3.1 7 5 9.1"></path>
+                            <path d="m3.1 17 1.9-2.1"></path>
+                            <path d="M20.9 7 19 9.1"></path>
+                            <path d="m20.9 17-1.9-2.1"></path>
+                            <rect width="8" height="14" x="8" y="6" rx="4"></rect>
+                            <path d="M12 11h.01"></path>
+                            <path d="M12 16h.01"></path>
+                        </svg>
                         Issues & Feedback
                     </a>
-                    <a href="https://github.com/Anes-03/MenuPy/wiki" class="btn btn-outline" target="_blank" rel="noopener">
-                        <span class="wiki-icon">📚</span>
+                    <a href="https://github.com/Anes-03/MenuPy/wiki" class="btn btn-outline" target="_blank"
+                        rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 8px;">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                        </svg>
                         Dokumentation
                     </a>
                 </div>
@@ -201,8 +431,9 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 MenuPy. Kostenlos und Open Source verfügbar.</p>
-            <p>Eine schlanke Lösung für Python-Automatisierung auf macOS</p>
+            <p>&copy; 2026 MenuPy • <strong style="color: var(--text-primary);">252425 HOMELAB</strong></p>
+            <p style="color: var(--text-primary); opacity: 0.7; font-size: 0.9rem;">Eine schlanke Lösung für
+                Python-Automatisierung auf macOS</p>
         </div>
     </footer>
     <!-- Structured data for better discoverability -->
@@ -235,7 +466,7 @@
                 if (!data || !Array.isArray(data.assets)) return;
                 // Prefer a macOS DMG asset
                 const asset = data.assets.find(a => typeof a.name === 'string' && a.name.toLowerCase().endsWith('.dmg'))
-                            || data.assets[0];
+                    || data.assets[0];
                 if (asset && asset.browser_download_url) {
                     btn.href = asset.browser_download_url;
                     btn.setAttribute('download', '');
@@ -245,8 +476,8 @@
                 if (sizeEl && asset && typeof asset.size === 'number') {
                     const bytes = asset.size;
                     const formatted = bytes > 1024 * 1024
-                      ? (bytes / (1024 * 1024)).toFixed(1) + ' MB'
-                      : Math.ceil(bytes / 1024) + ' KB';
+                        ? (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+                        : Math.ceil(bytes / 1024) + ' KB';
                     sizeEl.textContent = formatted;
                 }
             } catch (_) {
@@ -255,4 +486,5 @@
         })();
     </script>
 </body>
+
 </html>

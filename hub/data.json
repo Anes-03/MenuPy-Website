@@ -1,0 +1,512 @@
+[
+  {
+    "id": "downloads_sorter",
+    "name": "Downloads aufräumen",
+    "description": "Sortiert alte Dateien in ~/Downloads nach Typ und Monat.",
+    "long_description": "Dieses Skript hilft dabei, den Downloads-Ordner sauber zu halten. Es analysiert alle Dateien und verschiebt sie basierend auf ihrer Dateiendung in logische Unterordner wie 'Bilder', 'Dokumente' oder 'Archive'. Zusätzlich können Dateien nach ihrem Erstellungsmonat gruppiert werden. Über die Variable `MAX_AGE_DAYS` lässt sich einstellen, dass nur Dateien verschoben werden, die älter als ein bestimmter Zeitraum sind (Standard: 14 Tage). Ein 'Dry Run' Modus ist ebenfalls verfügbar, um Änderungen erst zu testen.",
+    "category": "System",
+    "tags": [
+      "Downloads",
+      "Cleanup",
+      "Sort"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/downloads_sorter.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Downloads aufraeumen\nDescription: Sortiert alte Dateien in ~/Downloads nach Typ und optional nach Monat.\nNote: Passe die Konfiguration unten an deine Beduerfnisse an.\n\"\"\"\nfrom __future__ import annotations\n\nfrom datetime import datetime\nfrom pathlib import Path\nimport os\nimport shutil\nimport subprocess\nimport time\n\n# --- Konfiguration ---\nDOWNLOADS_DIR = Path.home() / \"Downloads\"\nMAX_AGE_DAYS = 14  # None, um alles zu bewegen\nMOVE_BY_DATE = True\nDATE_FOLDER_FORMAT = \"%Y-%m\"\nDRY_RUN = False\n\nEXTENSION_MAP = {\n    \"pdf\": \"PDF\",\n    \"zip\": \"Archive\",\n    \"rar\": \"Archive\",\n    \"7z\": \"Archive\",\n    \"dmg\": \"Installer\",\n    \"pkg\": \"Installer\",\n    \"jpg\": \"Bilder\",\n    \"jpeg\": \"Bilder\",\n    \"png\": \"Bilder\",\n    \"heic\": \"Bilder\",\n    \"gif\": \"Bilder\",\n    \"mp4\": \"Videos\",\n    \"mov\": \"Videos\",\n    \"mp3\": \"Audio\",\n    \"wav\": \"Audio\",\n    \"csv\": \"Daten\",\n    \"xlsx\": \"Daten\",\n    \"xls\": \"Daten\",\n    \"doc\": \"Dokumente\",\n    \"docx\": \"Dokumente\",\n}\nDEFAULT_FOLDER = \"Sonstiges\"\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef is_old_enough(path: Path) -> bool:\n    if MAX_AGE_DAYS is None:\n        return True\n    cutoff = time.time() - (MAX_AGE_DAYS * 86400)\n    return path.stat().st_mtime < cutoff\n\n\ndef target_folder(path: Path) -> Path:\n    ext = path.suffix.lower().lstrip(\".\")\n    folder = EXTENSION_MAP.get(ext, DEFAULT_FOLDER)\n    base = DOWNLOADS_DIR / folder\n    if MOVE_BY_DATE:\n        stamp = datetime.fromtimestamp(path.stat().st_mtime).strftime(DATE_FOLDER_FORMAT)\n        return base / stamp\n    return base\n\n\ndef main() -> None:\n    if not DOWNLOADS_DIR.exists():\n        notify(\"Downloads\", \"Ordner nicht gefunden\")\n        return\n\n    moved = 0\n    skipped = 0\n\n    for item in DOWNLOADS_DIR.iterdir():\n        if item.is_dir():\n            continue\n        if item.name.startswith(\".\"):\n            continue\n        if not is_old_enough(item):\n            skipped += 1\n            continue\n\n        dest_dir = target_folder(item)\n        dest_dir.mkdir(parents=True, exist_ok=True)\n        dest_path = dest_dir / item.name\n\n        if DRY_RUN:\n            print(f\"DRY_RUN: {item} -> {dest_path}\")\n            moved += 1\n            continue\n\n        try:\n            shutil.move(str(item), str(dest_path))\n            moved += 1\n        except Exception as exc:\n            print(f\"Fehler beim Verschieben von {item}: {exc}\")\n\n    notify(\"Downloads aufgeraeumt\", f\"Verschoben: {moved}, Uebersprungen: {skipped}\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "daily_note",
+    "name": "Tagesnotiz erstellen",
+    "description": "Legt eine neue Markdown-Notiz mit Datum an und oeffnet sie.",
+    "long_description": "Automatisiert das tägliche Journaling oder die Aufgabenplanung. Das Skript erstellt eine neue Markdown-Datei im Ordner '~/Documents/Notes' mit dem aktuellen Datum als Dateiname. Die Datei wird mit einem vordefinierten Template (Aufgaben & Notizen) vorbefüllt und direkt in deiner Standard-App geöffnet. Falls die Notiz für heute bereits existiert, wird lediglich eine Benachrichtigung gesendet.",
+    "category": "Notizen",
+    "tags": [
+      "Markdown",
+      "Journal"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/daily_note.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Tagesnotiz erstellen\nDescription: Legt eine neue Markdown-Notiz mit Datum an und oeffnet sie.\n\"\"\"\nfrom __future__ import annotations\n\nfrom datetime import datetime\nfrom pathlib import Path\nimport subprocess\n\n# --- Konfiguration ---\nNOTES_DIR = Path.home() / \"Documents\" / \"Notes\"\nOPEN_AFTER_CREATE = True\n\nTEMPLATE = \"\"\"# {date}\n\n## Aufgaben\n- \n\n## Notizen\n- \n\"\"\"\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef main() -> None:\n    NOTES_DIR.mkdir(parents=True, exist_ok=True)\n    today = datetime.now().strftime(\"%Y-%m-%d\")\n    note_path = NOTES_DIR / f\"{today}.md\"\n\n    if not note_path.exists():\n        note_path.write_text(TEMPLATE.format(date=today), encoding=\"utf-8\")\n        notify(\"Tagesnotiz\", \"Neue Notiz erstellt\")\n    else:\n        notify(\"Tagesnotiz\", \"Notiz existiert bereits\")\n\n    if OPEN_AFTER_CREATE:\n        subprocess.run([\"open\", str(note_path)], check=False)\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "screenshot_ocr",
+    "name": "Screenshot OCR",
+    "description": "Screenshot aufnehmen, Text erkennen und ins Clipboard kopieren.",
+    "long_description": "Dieses Werkzeug kombiniert die macOS-Bildschirmaufnahme mit der Tesseract-Texterkennung. Nach dem Start kannst du einen Bereich auf dem Bildschirm auswählen. Der darin enthaltene Text wird extrahiert und sofort in deine Zwischenablage kopiert. Ideal, um Text aus Bildern, PDFs oder Videos schnell abzugreifen. Benötigt `tesseract`, welches einfach über `brew install tesseract` installiert werden kann.",
+    "category": "Medien",
+    "tags": [
+      "OCR",
+      "Screenshot"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "tesseract"
+    ],
+    "script_path": "scripts/screenshot_ocr.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Screenshot OCR\nDescription: Nimmt einen Screenshot, extrahiert Text via Tesseract und kopiert ihn.\nRequirements: tesseract (Homebrew: brew install tesseract)\n\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\nimport shutil\nimport subprocess\nimport tempfile\n\n# --- Konfiguration ---\nOCR_LANG = \"deu+eng\"\nSAVE_TEXT_FILE = False\nTEXT_OUTPUT_DIR = Path.home() / \"Documents\" / \"OCR\"\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef set_clipboard(text: str) -> None:\n    subprocess.run([\"pbcopy\"], input=text.encode(\"utf-8\"), check=False)\n\n\ndef main() -> None:\n    if shutil.which(\"tesseract\") is None:\n        notify(\"OCR\", \"tesseract fehlt. Installiere es via Homebrew.\")\n        return\n\n    with tempfile.TemporaryDirectory() as tmp:\n        img_path = Path(tmp) / \"capture.png\"\n        result_base = Path(tmp) / \"ocr\"\n\n        capture = subprocess.run([\"screencapture\", \"-i\", str(img_path)], check=False)\n        if capture.returncode != 0 or not img_path.exists():\n            notify(\"OCR\", \"Screenshot abgebrochen\")\n            return\n\n        ocr = subprocess.run(\n            [\"tesseract\", str(img_path), str(result_base), \"-l\", OCR_LANG],\n            capture_output=True,\n            check=False,\n        )\n        if ocr.returncode != 0:\n            notify(\"OCR\", \"Tesseract Fehler\")\n            return\n\n        text_path = Path(f\"{result_base}.txt\")\n        if not text_path.exists():\n            notify(\"OCR\", \"Kein Text erkannt\")\n            return\n\n        text = text_path.read_text(encoding=\"utf-8\", errors=\"ignore\").strip()\n        if not text:\n            notify(\"OCR\", \"Kein Text erkannt\")\n            return\n\n        set_clipboard(text)\n\n        if SAVE_TEXT_FILE:\n            TEXT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)\n            out_path = TEXT_OUTPUT_DIR / \"ocr_result.txt\"\n            out_path.write_text(text, encoding=\"utf-8\")\n\n        notify(\"OCR\", \"Text ins Clipboard kopiert\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "batch_images",
+    "name": "Bild-Batch Konvertierung",
+    "description": "Konvertiert Bilder stapelweise in ein Ziel-Format.",
+    "long_description": "Verarbeite ganze Ordner voller Bilder mit einem Klick. Das Skript nutzt `sips` (macOS intern) und optional `cwebp`, um Bilder in Formate wie WebP, JPEG oder PNG zu konvertieren. Du kannst die Zielqualität und eine maximale Auflösung (Resize) festlegen. Ideal, um große Fotosammlungen für das Web zu optimieren oder einheitliche Formate zu erzwingen.",
+    "category": "Medien",
+    "tags": [
+      "Bilder",
+      "Batch",
+      "Konvertierung"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "sips",
+      "cwebp (optional)"
+    ],
+    "script_path": "scripts/batch_images.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Bild-Batch Konvertierung\nDescription: Konvertiert Bilder stapelweise in ein Ziel-Format.\nRequirements: sips (macOS), optional cwebp fuer WebP-Ausgabe\n\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\nimport shutil\nimport subprocess\nimport tempfile\n\n# --- Konfiguration ---\nINPUT_DIR = Path.home() / \"Pictures\" / \"ToConvert\"\nOUTPUT_DIR = Path.home() / \"Pictures\" / \"Converted\"\nOUTPUT_FORMAT = \"webp\"  # webp, jpeg, png, tiff\nQUALITY = 80\nRESIZE_MAX = None  # z.B. 1600, oder None\n\nALLOWED_EXTS = {\".jpg\", \".jpeg\", \".png\", \".heic\", \".tiff\"}\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef convert_with_sips(source: Path, dest: Path, fmt: str) -> bool:\n    cmd = [\"sips\", \"-s\", \"format\", fmt]\n    if fmt == \"jpeg\":\n        cmd += [\"-s\", \"formatOptions\", str(QUALITY)]\n    if RESIZE_MAX:\n        cmd += [\"-Z\", str(RESIZE_MAX)]\n    cmd += [str(source), \"--out\", str(dest)]\n\n    result = subprocess.run(cmd, check=False, capture_output=True)\n    return result.returncode == 0 and dest.exists()\n\n\ndef convert_with_cwebp(source: Path, dest: Path) -> bool:\n    cmd = [\"cwebp\", str(source), \"-q\", str(QUALITY), \"-o\", str(dest)]\n    result = subprocess.run(cmd, check=False, capture_output=True)\n    return result.returncode == 0 and dest.exists()\n\n\ndef main() -> None:\n    if not INPUT_DIR.exists():\n        notify(\"Bild-Batch\", \"Eingabeordner fehlt\")\n        return\n\n    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)\n\n    target_format = OUTPUT_FORMAT.lower()\n    use_cwebp = target_format == \"webp\" and shutil.which(\"cwebp\")\n    if target_format == \"webp\" and not use_cwebp:\n        target_format = \"jpeg\"\n        notify(\"Bild-Batch\", \"cwebp fehlt, nutze JPEG als Fallback\")\n\n    converted = 0\n    failed = 0\n\n    for image in INPUT_DIR.iterdir():\n        if image.suffix.lower() not in ALLOWED_EXTS:\n            continue\n        if not image.is_file():\n            continue\n\n        out_name = image.stem + f\".{target_format}\"\n        out_path = OUTPUT_DIR / out_name\n\n        try:\n            if use_cwebp:\n                if RESIZE_MAX:\n                    with tempfile.TemporaryDirectory() as tmp:\n                        temp_path = Path(tmp) / \"temp.png\"\n                        ok = convert_with_sips(image, temp_path, \"png\")\n                        if not ok:\n                            raise RuntimeError(\"Resize fehlgeschlagen\")\n                        ok = convert_with_cwebp(temp_path, out_path)\n                else:\n                    ok = convert_with_cwebp(image, out_path)\n            else:\n                ok = convert_with_sips(image, out_path, target_format)\n\n            if ok:\n                converted += 1\n            else:\n                failed += 1\n        except Exception:\n            failed += 1\n\n    notify(\"Bild-Batch\", f\"Fertig: {converted}, Fehler: {failed}\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "project_launcher",
+    "name": "Projekt Starter",
+    "description": "Öffnet definierte Ordner, Apps und URLs mit einem Klick.",
+    "long_description": "Ein mächtiger Shortcut für deinen Workflow. Definiere in der Konfiguration eine Liste von Ordnern (z.B. dein aktuelles Projekt), Applikationen (z.B. VS Code, Slack) und URLs (z.B. GitHub Repo, Ticket-System). Das Skript öffnet alles nacheinander mit einer kurzen Verzögerung, damit dein System nicht überlastet wird. Perfekt, um morgens mit einem Klick alle relevanten Tools zu starten.",
+    "category": "Projekt",
+    "tags": [
+      "Launch",
+      "Apps",
+      "URLs"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/project_launcher.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Projekt Starter\nDescription: Oeffnet definierte Ordner, Apps und URLs mit einem Klick.\n\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\nimport subprocess\nimport time\n\n# --- Konfiguration ---\nFOLDERS = [\n    Path.home() / \"Projects\",\n]\n\nAPPS = [\n    \"Visual Studio Code\",\n    \"Safari\",\n]\n\nURLS = [\n    \"https://github.com\",\n]\n\nDELAY_SECONDS = 0.2\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef main() -> None:\n    for folder in FOLDERS:\n        if folder.exists():\n            subprocess.run([\"open\", str(folder)], check=False)\n            time.sleep(DELAY_SECONDS)\n\n    for app in APPS:\n        subprocess.run([\"open\", \"-a\", app], check=False)\n        time.sleep(DELAY_SECONDS)\n\n    for url in URLS:\n        subprocess.run([\"open\", url], check=False)\n        time.sleep(DELAY_SECONDS)\n\n    notify(\"Projekt Starter\", \"Alles geoeffnet\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "quick_backup",
+    "name": "Backup Schnellschuss",
+    "description": "Erstellt ein ZIP-Backup eines Ordners im Backup-Verzeichnis.",
+    "long_description": "Schnelle Datensicherung ohne komplexe Software. Wähle einen Quellordner aus und das Skript erstellt ein zeitgestempeltes ZIP-Archiv im Zielverzeichnis. Besonders nützlich: Über `KEEP_LAST` wird eine automatische Rotation durchgeführt, sodass nur die letzten X Backups behalten werden. So bleibt dein Speicherplatz geschont, während du immer eine aktuelle Kopie deiner wichtigsten Dokumente hast.",
+    "category": "Backup",
+    "tags": [
+      "ZIP",
+      "Archiv"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/quick_backup.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Backup Schnellschuss\nDescription: Erstellt ein ZIP-Backup eines Ordners in einem Backup-Verzeichnis.\n\"\"\"\nfrom __future__ import annotations\n\nfrom datetime import datetime\nfrom pathlib import Path\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nSOURCE_DIR = Path.home() / \"Documents\"\nBACKUP_DIR = Path.home() / \"Backups\"\nZIP_PREFIX = \"Documents\"\nKEEP_LAST = 10  # aeltere Backups loeschen, None fuer unbegrenzt\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef cleanup_old_backups() -> None:\n    if KEEP_LAST is None:\n        return\n    archives = sorted(BACKUP_DIR.glob(f\"{ZIP_PREFIX}-*.zip\"))\n    if len(archives) <= KEEP_LAST:\n        return\n    for old in archives[: -KEEP_LAST]:\n        old.unlink(missing_ok=True)\n\n\ndef main() -> None:\n    if not SOURCE_DIR.exists():\n        notify(\"Backup\", \"Quelle nicht gefunden\")\n        return\n\n    BACKUP_DIR.mkdir(parents=True, exist_ok=True)\n    stamp = datetime.now().strftime(\"%Y-%m-%d_%H-%M-%S\")\n    base_name = BACKUP_DIR / f\"{ZIP_PREFIX}-{stamp}\"\n\n    try:\n        archive_path = shutil.make_archive(str(base_name), \"zip\", str(SOURCE_DIR))\n        cleanup_old_backups()\n        notify(\"Backup\", f\"Fertig: {Path(archive_path).name}\")\n    except Exception as exc:\n        notify(\"Backup\", f\"Fehler: {exc}\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "ollama_clipboard_summary",
+    "name": "Clipboard Zusammenfassung (Ollama)",
+    "description": "Fasst Clipboard-Text zusammen und kopiert das Ergebnis.",
+    "long_description": "Nutze die Power von lokaler KI (Ollama), um Texte blitzschnell zu kondensieren. Das Skript nimmt den aktuellen Inhalt deiner Zwischenablage und sendet ihn an ein Llama 3.1 Modell. Du erhältst eine strukturierte Zusammenfassung in Stichpunkten, die sofort wieder im Clipboard landet. Perfekt für lange Artikel oder E-Mails, die du nur kurz abscannen möchtest. Erfordert eine laufende Ollama-Instanz.",
+    "category": "Ollama",
+    "tags": [
+      "Clipboard",
+      "Summary"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_clipboard_summary.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Clipboard Zusammenfassung (Ollama)\nDescription: Fasst den aktuellen Clipboard-Text zusammen und kopiert die Summary.\nRequirements: ollama (https://ollama.com)\n\"\"\"\nfrom __future__ import annotations\n\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nMODEL = \"llama3.1\"\nMAX_CHARS = 12000\nSTYLE = \"Stichpunkte\"  # Stichpunkte oder Fliesstext\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef get_clipboard() -> str:\n    result = subprocess.run([\"pbpaste\"], capture_output=True, check=False)\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\")\n\n\ndef set_clipboard(text: str) -> None:\n    subprocess.run([\"pbcopy\"], input=text.encode(\"utf-8\"), check=False)\n\n\ndef run_ollama(prompt: str) -> str | None:\n    if shutil.which(\"ollama\") is None:\n        notify(\"Ollama\", \"ollama ist nicht installiert\")\n        return None\n\n    result = subprocess.run(\n        [\"ollama\", \"run\", MODEL],\n        input=prompt.encode(\"utf-8\"),\n        capture_output=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        notify(\"Ollama\", \"Fehler beim Modell\")\n        return None\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\").strip()\n\n\ndef main() -> None:\n    text = get_clipboard().strip()\n    if not text:\n        notify(\"Clipboard\", \"Kein Text im Clipboard\")\n        return\n\n    if len(text) > MAX_CHARS:\n        text = text[:MAX_CHARS]\n\n    if STYLE.lower().startswith(\"stich\"):\n        style = \"Erzeuge 5-7 Stichpunkte.\"\n    else:\n        style = \"Erzeuge einen kurzen Fliesstext mit 3-5 Saetzen.\"\n\n    prompt = (\n        \"Du bist ein hilfreicher Assistent. Fasse den folgenden Text knapp zusammen. \"\n        f\"{style}\\n\\nText:\\n{text}\"\n    )\n\n    summary = run_ollama(prompt)\n    if not summary:\n        return\n\n    set_clipboard(summary)\n    notify(\"Ollama\", \"Zusammenfassung kopiert\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "ollama_translate_clipboard",
+    "name": "Clipboard Übersetzer (Ollama)",
+    "description": "Übersetzt Clipboard-Text in die Ziel-Sprache.",
+    "long_description": "Ein privater und kostenloser Übersetzer direkt in der Menüleiste. Kopiere Text in einer beliebigen Sprache, starte das Skript und die KI übersetzt den Inhalt automatisch (Standard: Deutsch). Der übersetzte Text ersetzt das Original in deiner Zwischenablage. Da alles lokal über Ollama läuft, verlassen deine Daten niemals deinen Rechner – ideal für vertrauliche Dokumente.",
+    "category": "Ollama",
+    "tags": [
+      "Uebersetzung",
+      "Clipboard"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_translate_clipboard.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Clipboard Uebersetzer (Ollama)\nDescription: Uebersetzt Clipboard-Text in die Ziel-Sprache.\nRequirements: ollama (https://ollama.com)\n\"\"\"\nfrom __future__ import annotations\n\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nMODEL = \"llama3.1\"\nTARGET_LANGUAGE = \"Deutsch\"\nSOURCE_LANGUAGE = \"auto\"\nMAX_CHARS = 12000\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef get_clipboard() -> str:\n    result = subprocess.run([\"pbpaste\"], capture_output=True, check=False)\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\")\n\n\ndef set_clipboard(text: str) -> None:\n    subprocess.run([\"pbcopy\"], input=text.encode(\"utf-8\"), check=False)\n\n\ndef run_ollama(prompt: str) -> str | None:\n    if shutil.which(\"ollama\") is None:\n        notify(\"Ollama\", \"ollama ist nicht installiert\")\n        return None\n\n    result = subprocess.run(\n        [\"ollama\", \"run\", MODEL],\n        input=prompt.encode(\"utf-8\"),\n        capture_output=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        notify(\"Ollama\", \"Fehler beim Modell\")\n        return None\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\").strip()\n\n\ndef main() -> None:\n    text = get_clipboard().strip()\n    if not text:\n        notify(\"Clipboard\", \"Kein Text im Clipboard\")\n        return\n\n    if len(text) > MAX_CHARS:\n        text = text[:MAX_CHARS]\n\n    prompt = (\n        \"Uebersetze den folgenden Text. \"\n        f\"Quellsprache: {SOURCE_LANGUAGE}. Ziel: {TARGET_LANGUAGE}. \"\n        \"Behalte Bedeutung und Ton.\\n\\nText:\\n\"\n        f\"{text}\"\n    )\n\n    translated = run_ollama(prompt)\n    if not translated:\n        return\n\n    set_clipboard(translated)\n    notify(\"Ollama\", \"Uebersetzung kopiert\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "ollama_rewrite_tone",
+    "name": "Text umschreiben (Ollama)",
+    "description": "Schreibt Clipboard-Text in einer Tonalität um.",
+    "long_description": "Optimiere deine Texte für verschiedene Anlässe. Kopiere einen Entwurf und lass die KI ihn in einer bestimmten Tonalität (z.B. 'höflich und professionell' oder 'locker und freundlich') umschreiben. Das Skript achtet darauf, die Kernbotschaft beizubehalten, während Sprachfluss und Wortwahl verbessert werden. Das Ergebnis landet direkt wieder in deiner Zwischenablage.",
+    "category": "Ollama",
+    "tags": [
+      "Tone",
+      "Rewrite"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_rewrite_tone.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Text umschreiben (Ollama)\nDescription: Schreibt Clipboard-Text in einer gewuenschten Tonalitaet um.\nRequirements: ollama (https://ollama.com)\n\"\"\"\nfrom __future__ import annotations\n\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nMODEL = \"llama3.1\"\nTONE = \"freundlich und klar\"\nMAX_CHARS = 12000\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef get_clipboard() -> str:\n    result = subprocess.run([\"pbpaste\"], capture_output=True, check=False)\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\")\n\n\ndef set_clipboard(text: str) -> None:\n    subprocess.run([\"pbcopy\"], input=text.encode(\"utf-8\"), check=False)\n\n\ndef run_ollama(prompt: str) -> str | None:\n    if shutil.which(\"ollama\") is None:\n        notify(\"Ollama\", \"ollama ist nicht installiert\")\n        return None\n\n    result = subprocess.run(\n        [\"ollama\", \"run\", MODEL],\n        input=prompt.encode(\"utf-8\"),\n        capture_output=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        notify(\"Ollama\", \"Fehler beim Modell\")\n        return None\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\").strip()\n\n\ndef main() -> None:\n    text = get_clipboard().strip()\n    if not text:\n        notify(\"Clipboard\", \"Kein Text im Clipboard\")\n        return\n\n    if len(text) > MAX_CHARS:\n        text = text[:MAX_CHARS]\n\n    prompt = (\n        \"Schreibe den folgenden Text um. \"\n        f\"Tonalitaet: {TONE}. \"\n        \"Behalte die Bedeutung, aber optimiere Lesbarkeit.\\n\\nText:\\n\"\n        f\"{text}\"\n    )\n\n    rewritten = run_ollama(prompt)\n    if not rewritten:\n        return\n\n    set_clipboard(rewritten)\n    notify(\"Ollama\", \"Umschrift kopiert\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "ollama_file_summary",
+    "name": "Datei Zusammenfassung (Ollama)",
+    "description": "Fasst die neueste Textdatei in einem Ordner zusammen.",
+    "long_description": "Analysiere automatisch die neuesten Dokumente in deinem Downloads- oder Projektordner. Das Skript sucht die aktuellste Text-, Markdown- oder Log-Datei und generiert eine prägnante Zusammenfassung der wichtigsten Punkte und Ergebnisse. Das spart Zeit beim Sichten von Logfiles oder frisch heruntergeladenen Artikeln. Die Zusammenfassung wird als neue Textdatei in '~/Documents/Summaries' gespeichert.",
+    "category": "Ollama",
+    "tags": [
+      "Datei",
+      "Summary"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_file_summary.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Datei Zusammenfassung (Ollama)\nDescription: Fasst die neueste Textdatei in einem Ordner zusammen.\nRequirements: ollama (https://ollama.com)\n\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nMODEL = \"llama3.1\"\nWATCH_DIR = Path.home() / \"Downloads\"\nEXTENSIONS = {\".txt\", \".md\", \".log\"}\nRECURSIVE = False\nMAX_CHARS = 16000\nOUTPUT_DIR = Path.home() / \"Documents\" / \"Summaries\"\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef run_ollama(prompt: str) -> str | None:\n    if shutil.which(\"ollama\") is None:\n        notify(\"Ollama\", \"ollama ist nicht installiert\")\n        return None\n\n    result = subprocess.run(\n        [\"ollama\", \"run\", MODEL],\n        input=prompt.encode(\"utf-8\"),\n        capture_output=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        notify(\"Ollama\", \"Fehler beim Modell\")\n        return None\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\").strip()\n\n\ndef pick_latest_file() -> Path | None:\n    if not WATCH_DIR.exists():\n        return None\n\n    if RECURSIVE:\n        candidates = [p for p in WATCH_DIR.rglob(\"*\") if p.suffix.lower() in EXTENSIONS]\n    else:\n        candidates = [p for p in WATCH_DIR.iterdir() if p.suffix.lower() in EXTENSIONS]\n\n    candidates = [p for p in candidates if p.is_file()]\n    if not candidates:\n        return None\n\n    return max(candidates, key=lambda p: p.stat().st_mtime)\n\n\ndef main() -> None:\n    target = pick_latest_file()\n    if not target:\n        notify(\"Ollama\", \"Keine passende Datei gefunden\")\n        return\n\n    text = target.read_text(encoding=\"utf-8\", errors=\"ignore\").strip()\n    if not text:\n        notify(\"Ollama\", \"Datei ist leer\")\n        return\n\n    if len(text) > MAX_CHARS:\n        text = text[:MAX_CHARS]\n\n    prompt = (\n        \"Fasse den folgenden Text in 5-8 Stichpunkten zusammen. \"\n        \"Erwaehne Schluesselthemen und Ergebnisse.\\n\\nText:\\n\"\n        f\"{text}\"\n    )\n\n    summary = run_ollama(prompt)\n    if not summary:\n        return\n\n    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)\n    out_path = OUTPUT_DIR / f\"{target.stem}.summary.txt\"\n    out_path.write_text(summary, encoding=\"utf-8\")\n    notify(\"Ollama\", f\"Summary erstellt: {out_path.name}\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "ollama_reply_draft",
+    "name": "Antwort-Entwurf (Ollama)",
+    "description": "Erstellt einen kurzen Reply-Entwurf aus Clipboard-Text.",
+    "long_description": "Schluss mit Schreibblockaden. Kopiere eine Nachricht oder E-Mail, auf die du antworten musst, und starte das Skript. Die KI erstellt einen prägnanten, professionellen und freundlichen Antwortentwurf, der direkt in deine Zwischenablage kopiert wird. Du kannst sogar eine eigene Signatur in der Konfiguration hinterlegen, die automatisch angefügt wird.",
+    "category": "Ollama",
+    "tags": [
+      "Reply",
+      "Entwurf"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_reply_draft.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Antwort-Entwurf (Ollama)\nDescription: Erstellt einen kurzen Reply-Entwurf aus Clipboard-Text.\nRequirements: ollama (https://ollama.com)\n\"\"\"\nfrom __future__ import annotations\n\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nMODEL = \"llama3.1\"\nTONE = \"professionell und freundlich\"\nMAX_CHARS = 12000\nSIGNATURE = \"\"  # z.B. \"\\n\\nViele Gruesse\\nName\"\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef get_clipboard() -> str:\n    result = subprocess.run([\"pbpaste\"], capture_output=True, check=False)\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\")\n\n\ndef set_clipboard(text: str) -> None:\n    subprocess.run([\"pbcopy\"], input=text.encode(\"utf-8\"), check=False)\n\n\ndef run_ollama(prompt: str) -> str | None:\n    if shutil.which(\"ollama\") is None:\n        notify(\"Ollama\", \"ollama ist nicht installiert\")\n        return None\n\n    result = subprocess.run(\n        [\"ollama\", \"run\", MODEL],\n        input=prompt.encode(\"utf-8\"),\n        capture_output=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        notify(\"Ollama\", \"Fehler beim Modell\")\n        return None\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\").strip()\n\n\ndef main() -> None:\n    text = get_clipboard().strip()\n    if not text:\n        notify(\"Clipboard\", \"Kein Text im Clipboard\")\n        return\n\n    if len(text) > MAX_CHARS:\n        text = text[:MAX_CHARS]\n\n    prompt = (\n        \"Schreibe eine kurze Antwort auf den folgenden Text. \"\n        f\"Tonalitaet: {TONE}. \"\n        \"Antworte praegnand und hilfreich.\\n\\nText:\\n\"\n        f\"{text}\"\n    )\n\n    draft = run_ollama(prompt)\n    if not draft:\n        return\n\n    if SIGNATURE:\n        draft = draft.rstrip() + SIGNATURE\n\n    set_clipboard(draft)\n    notify(\"Ollama\", \"Entwurf kopiert\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "ollama_daily_planner",
+    "name": "Tagesplanung (Ollama)",
+    "description": "Erstellt eine priorisierte Tagesplanung aus Clipboard-Tasks.",
+    "long_description": "Verwandle eine ungeordnete Liste von Gedanken oder Aufgaben in einen strukturierten Tagesplan. Kopiere deine Notizen, To-Dos oder Termine und die KI generiert eine priorisierte Liste mit geschätzten Zeitblöcken und einer logischen Reihenfolge. Der fertige Plan wird sowohl in die Zwischenablage kopiert als auch als Datei in '~/Documents/Planning' gespeichert, damit du direkt loslegen kannst.",
+    "category": "Ollama",
+    "tags": [
+      "Planung",
+      "Tasks"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_daily_planner.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Tagesplanung (Ollama)\nDescription: Erstellt eine priorisierte Tagesplanung aus Clipboard-Tasks.\nRequirements: ollama (https://ollama.com)\n\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\nimport shutil\nimport subprocess\n\n# --- Konfiguration ---\nMODEL = \"llama3.1\"\nMAX_CHARS = 12000\nOUTPUT_DIR = Path.home() / \"Documents\" / \"Planning\"\nSAVE_TO_FILE = True\n\n\ndef notify(title: str, message: str) -> None:\n    try:\n        subprocess.run(\n            [\"osascript\", \"-e\", f'display notification \"{message}\" with title \"{title}\"'],\n            check=False,\n        )\n    except Exception:\n        pass\n\n\ndef get_clipboard() -> str:\n    result = subprocess.run([\"pbpaste\"], capture_output=True, check=False)\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\")\n\n\ndef set_clipboard(text: str) -> None:\n    subprocess.run([\"pbcopy\"], input=text.encode(\"utf-8\"), check=False)\n\n\ndef run_ollama(prompt: str) -> str | None:\n    if shutil.which(\"ollama\") is None:\n        notify(\"Ollama\", \"ollama ist nicht installiert\")\n        return None\n\n    result = subprocess.run(\n        [\"ollama\", \"run\", MODEL],\n        input=prompt.encode(\"utf-8\"),\n        capture_output=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        notify(\"Ollama\", \"Fehler beim Modell\")\n        return None\n    return result.stdout.decode(\"utf-8\", errors=\"ignore\").strip()\n\n\ndef main() -> None:\n    tasks = get_clipboard().strip()\n    if not tasks:\n        notify(\"Clipboard\", \"Kein Text im Clipboard\")\n        return\n\n    if len(tasks) > MAX_CHARS:\n        tasks = tasks[:MAX_CHARS]\n\n    prompt = (\n        \"Du bist ein Planungsassistent. Erstelle eine Tagesplanung mit Prioritaeten \"\n        \"und Zeitbloecken. Gib eine klare Reihenfolge und realistische Dauer an.\\n\\n\"\n        \"Aufgaben:\\n\"\n        f\"{tasks}\"\n    )\n\n    plan = run_ollama(prompt)\n    if not plan:\n        return\n\n    set_clipboard(plan)\n\n    if SAVE_TO_FILE:\n        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)\n        out_path = OUTPUT_DIR / \"day-plan.txt\"\n        out_path.write_text(plan, encoding=\"utf-8\")\n\n    notify(\"Ollama\", \"Tagesplan erstellt\")\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  {
+    "id": "wifi_info",
+    "name": "WiFi Info",
+    "description": "Zeigt das aktuelle WiFi-Netzwerk (SSID) und die Signalstärke (RSSI) an.",
+    "long_description": "Behalte deine Netzwerkverbindung im Blick. Dieses Skript nutzt das macOS-interne 'airport'-Tool, um Informationen über dein aktuelles WiFi-Netzwerk abzurufen. Es zeigt dir den Namen (SSID) des Netzwerks, mit dem du verbunden bist, sowie die Signalstärke in dBm an. Perfekt, um tote Winkel in deiner Wohnung zu finden oder die Verbindungsqualität schnell zu prüfen.",
+    "category": "Network",
+    "tags": [
+      "WiFi",
+      "Network",
+      "Status"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/wifi_info.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: WiFi Info\nDescription: Zeigt das aktuelle WiFi-Netzwerk (SSID) und die Signalst\u00e4rke (RSSI) an.\n\"\"\"\nimport subprocess\nimport re\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_wifi_info():\n    try:\n        # macOS specific command for airport utility\n        cmd = ['/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport', '-I']\n        result = subprocess.run(cmd, capture_output=True, text=True, check=False)\n        output = result.stdout\n        \n        ssid = re.search(r' SSID: (.*)', output)\n        rssi = re.search(r' agrCtlRSSI: (.*)', output)\n        \n        if ssid:\n            name = ssid.group(1).strip()\n            signal = rssi.group(1).strip() if rssi else \"N/A\"\n            return f\"Verbunden mit: {name} (Signal: {signal} dBm)\"\n        return \"Nicht mit einem WiFi-Netzwerk verbunden.\"\n    except Exception as e:\n        return f\"Fehler beim Abrufen der WiFi-Info: {e}\"\n\nif __name__ == \"__main__\":\n    info = get_wifi_info()\n    notify(\"WiFi Status\", info)\n    print(info)\n"
+  },
+  {
+    "id": "battery_info",
+    "name": "Battery Health",
+    "description": "Zeigt Batteriestatus, Ladezyklen und Zustand an.",
+    "long_description": "Detaillierte Einblicke in deinen Laptop-Akku. Das Skript kombiniert Daten von 'pmset' und dem 'system_profiler', um dir einen umfassenden Überblick zu geben. Es zeigt den aktuellen Ladestand in Prozent, die Anzahl der bisherigen Ladezyklen sowie den allgemeinen Gesundheitszustand der Batterie an. Ein Muss für jeden MacBook-Poweruser.",
+    "category": "System",
+    "tags": [
+      "Battery",
+      "Power",
+      "Hardware"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/battery_info.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Battery Health\nDescription: Zeigt Batteriestatus, Ladezyklen und Temperatur an.\n\"\"\"\nimport subprocess\nimport re\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_battery_info():\n    try:\n        cmd = ['pmset', '-g', 'batt']\n        result = subprocess.run(cmd, capture_output=True, text=True, check=False)\n        output = result.stdout\n        \n        # Power source and percentage\n        pct_match = re.search(r'(\\d+)%', output)\n        percent = pct_match.group(1) if pct_match else \"N/A\"\n        \n        # Cycles and Health via system_profiler\n        cmd_prof = ['system_profiler', 'SPPowerDataType']\n        res_prof = subprocess.run(cmd_prof, capture_output=True, text=True, check=False)\n        prof_out = res_prof.stdout\n        \n        cycles = re.search(r'Cycle Count: (\\d+)', prof_out)\n        condition = re.search(r'Condition: (.*)', prof_out)\n        \n        c_count = cycles.group(1) if cycles else \"N/A\"\n        cond = condition.group(1).strip() if condition else \"N/A\"\n        \n        return f\"Ladestand: {percent}% | Zyklen: {c_count} | Zustand: {cond}\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    info = get_battery_info()\n    notify(\"Batterie Info\", info)\n    print(info)\n"
+  },
+  {
+    "id": "clean_desktop",
+    "name": "Schreibtisch aufräumen",
+    "description": "Verschiebt alle Dateien vom Schreibtisch in einen Archiv-Ordner.",
+    "long_description": "Verabschiede dich vom Desktop-Chaos. Dieses Skript scannt deinen Schreibtisch nach Dateien und verschiebt sie in einen übersichtlichen Archiv-Ordner unter 'Dokumente/Desktop Architecture', sortiert nach dem aktuellen Datum. Ordner und versteckte Systemdateien bleiben dabei unberührt. So hast du im Handumdrehen einen leeren Desktop für konzentriertes Arbeiten.",
+    "category": "Cleanup",
+    "tags": [
+      "Desktop",
+      "Archive",
+      "Cleanup"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/clean_desktop.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Schreibtisch aufr\u00e4umen\nDescription: Verschiebt alle Dateien vom Schreibtisch in einen Archiv-Ordner.\n\"\"\"\nimport os\nimport shutil\nfrom pathlib import Path\nfrom datetime import datetime\nimport subprocess\n\nDESKTOP = Path.home() / \"Desktop\"\nARCHIVE = Path.home() / \"Documents\" / \"Desktop Architecture\" / datetime.now().strftime(\"%Y-%m-%d\")\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef clean_desktop():\n    if not DESKTOP.exists():\n        return \"Desktop-Ordner nicht gefunden.\"\n    \n    files = [f for f in DESKTOP.iterdir() if f.is_file() and not f.name.startswith('.')]\n    \n    if not files:\n        return \"Der Schreibtisch ist bereits sauber!\"\n    \n    ARCHIVE.mkdir(parents=True, exist_ok=True)\n    count = 0\n    \n    for f in files:\n        try:\n            shutil.move(str(f), str(ARCHIVE / f.name))\n            count += 1\n        except Exception as e:\n            print(f\"Fehler bei {f.name}: {e}\")\n            \n    return f\"{count} Dateien nach {ARCHIVE.relative_to(Path.home())} verschoben.\"\n\nif __name__ == \"__main__\":\n    result = clean_desktop()\n    notify(\"Desktop Cleanup\", result)\n    print(result)\n"
+  },
+  {
+    "id": "ollama_code_reviewer",
+    "name": "Code Reviewer (Ollama)",
+    "description": "Analysiert Code in der Zwischenablage auf Fehler und Verbesserungen.",
+    "long_description": "Dein persönlicher Pair-Programmer auf Knopfdruck. Kopiere ein Code-Snippet in deine Zwischenablage und starte das Skript. Die lokale KI (Ollama mit Llama 3.1) analysiert den Code auf logische Fehler, Sicherheitslücken und gibt Tipps für bessere Lesbarkeit und Best Practices. Das Review wird direkt in deine Zwischenablage kopiert, sodass du es sofort neben deinem Code lesen kannst.",
+    "category": "Ollama",
+    "tags": [
+      "AI",
+      "Code",
+      "Review"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_code_reviewer.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Code Reviewer (Ollama)\nDescription: Analysiert Code in der Zwischenablage auf Fehler und Verbesserungen.\n\"\"\"\nimport subprocess\nimport shutil\n\nMODEL = \"llama3.1\"\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef review_code():\n    if not shutil.which(\"ollama\"):\n        return \"Fehler: Ollama ist nicht installiert.\"\n    \n    code = get_clipboard().strip()\n    if not code:\n        return \"Fehler: Keine Daten in der Zwischenablage.\"\n    \n    prompt = f\"Reviewe diesen Code auf Fehler, Best Practices und Sicherheit. Gib konstruktive Vorschl\u00e4ge:\\n\\n{code}\"\n    \n    try:\n        result = subprocess.run(['ollama', 'run', MODEL], input=prompt, capture_output=True, text=True, check=False)\n        review = result.stdout.strip()\n        \n        if review:\n            set_clipboard(review)\n            return \"Review abgeschlossen und in Zwischenablage kopiert.\"\n        return \"Keine Antwort vom Modell erhalten.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    status = review_code()\n    notify(\"Ollama Reviewer\", status)\n    print(status)\n"
+  },
+  {
+    "id": "url_shortener",
+    "name": "URL Shortener",
+    "description": "Verkürzt eine URL aus der Zwischenablage via TinyURL API.",
+    "long_description": "Mache Schluss mit überlangen Links. Dieses Skript nimmt eine URL aus deiner Zwischenablage, sendet sie an die TinyURL API und kopiert den kurzen Link sofort wieder zurück in deine Ablage. Ideal für das Teilen von Links in sozialen Medien, Messenger-Diensten oder E-Mails, ohne das Layout zu sprengen.",
+    "category": "Utility",
+    "tags": [
+      "URL",
+      "Web",
+      "Utility"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/url_shortener.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: URL Shortener\nDescription: Verk\u00fcrzt eine URL aus der Zwischenablage via TinyURL API.\n\"\"\"\nimport subprocess\nimport urllib.request\nimport urllib.parse\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef shorten_url():\n    try:\n        url = subprocess.check_output(['pbpaste'], text=True).strip()\n        if not url.startswith('http'):\n            return \"Fehler: Ung\u00fcltige URL in der Zwischenablage.\"\n        \n        api_url = \"http://tinyurl.com/api-create.php?url=\" + urllib.parse.quote(url)\n        with urllib.request.urlopen(api_url) as response:\n            short_url = response.read().decode('utf-8')\n            \n        subprocess.run(['pbcopy'], input=short_url.encode('utf-8'), check=False)\n        return f\"Verk\u00fcrzt: {short_url} (in Zwischenablage)\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = shorten_url()\n    notify(\"URL Shortener\", res)\n    print(res)\n"
+  },
+  {
+    "id": "disk_usage",
+    "name": "Speicherplatz prüfen",
+    "description": "Überprüft den freien Speicherplatz auf der Festplatte.",
+    "long_description": "Behalte deinen Speicherplatz im Griff. Dieses Skript prüft die Kapazität deiner Hauptfestplatte und berechnet den freien Speicherplatz sowohl in Gigabyte als auch in Prozent. Du erhältst eine übersichtliche macOS-Benachrichtigung, die dich sofort informiert, wenn der Platz knapp wird – ideal zur Vorbeugung von Systemverlangsamungen.",
+    "category": "System",
+    "tags": [
+      "Space",
+      "Disk",
+      "System"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/disk_usage.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Speicherplatz pr\u00fcfen\nDescription: \u00dcberpr\u00fcft den freien Speicherplatz auf der Festplatte.\n\"\"\"\nimport shutil\nimport subprocess\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef check_disk_usage():\n    total, used, free = shutil.disk_usage(\"/\")\n    \n    # Convert to GB\n    free_gb = free // (2**30)\n    percent_free = (free / total) * 100\n    \n    msg = f\"Frei: {free_gb} GB ({percent_free:.1f}% verf\u00fcgbar)\"\n    return msg\n\nif __name__ == \"__main__\":\n    result = check_disk_usage()\n    notify(\"Festplatte\", result)\n    print(result)\n"
+  },
+  {
+    "id": "ip_checker",
+    "name": "Public IP Checker",
+    "description": "Ruft die aktuelle öffentliche IP-Adresse ab.",
+    "long_description": "Finde schnell heraus, unter welcher Adresse du im Internet sichtbar bist. Das Skript nutzt die ipify API, um deine aktuelle öffentliche IPv4-Adresse abzufragen und zeigt sie direkt in einer Benachrichtigung an. Besonders nützlich, wenn du VPNs nutzt oder die Konfiguration deines Routers prüfen möchtest, ohne eine Webseite aufrufen zu müssen.",
+    "category": "Network",
+    "tags": [
+      "IP",
+      "Network",
+      "Utility"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/ip_checker.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Public IP Checker\nDescription: Ruft die aktuelle \u00f6ffentliche IP-Adresse ab.\n\"\"\"\nimport urllib.request\nimport subprocess\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_public_ip():\n    try:\n        with urllib.request.urlopen('https://api.ipify.org') as response:\n            public_ip = response.read().decode('utf-8')\n        return f\"Deine \u00f6ffentliche IP: {public_ip}\"\n    except Exception as e:\n        return f\"Fehler beim Abrufen der IP: {e}\"\n\nif __name__ == \"__main__\":\n    ip = get_public_ip()\n    notify(\"Netzwerk\", ip)\n    print(ip)\n"
+  },
+  {
+    "id": "password_gen",
+    "name": "Passwort Generator",
+    "description": "Erzeugt ein sicheres Passwort und kopiert es in die Zwischenablage.",
+    "long_description": "Erstelle im Handumdrehen kryptografisch sichere Passwörter. Das Skript generiert eine zufällige Zeichenfolge aus Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen (Standardlänge: 16 Zeichen). Das neue Passwort wird sofort in deine Zwischenablage kopiert, sodass du es direkt in deinem Account oder Passwortmanager einfügen kannst. Schnell, sicher und lokal.",
+    "category": "Utility",
+    "tags": [
+      "Security",
+      "Password",
+      "Generator"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/password_gen.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Passwort Generator\nDescription: Erzeugt ein sicheres Passwort und kopiert es in die Zwischenablage.\n\"\"\"\nimport secrets\nimport string\nimport subprocess\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef generate_password(length=16):\n    alphabet = string.ascii_letters + string.digits + \"!@#$%^&*\"\n    password = ''.join(secrets.choice(alphabet) for _ in range(length))\n    \n    # Copy to clipboard\n    subprocess.run(['pbcopy'], input=password.encode('utf-8'), check=False)\n    return \"Sicheres Passwort generiert und kopiert.\"\n\nif __name__ == \"__main__\":\n    msg = generate_password()\n    notify(\"Passwort\", msg)\n    print(msg)\n"
+  },
+  {
+    "id": "md_to_html",
+    "name": "Markdown zu HTML",
+    "description": "Konvertiert Markdown aus der Zwischenablage in HTML.",
+    "long_description": "Beschleunige deine Web-Entwicklung. Kopiere einen Text in Markdown-Format (z.B. Überschriften, Fett/Kursiv) und starte dieses Skript. Es wandelt die Syntax automatisch in sauberes HTML um und kopiert das Ergebnis direkt zurück in deine Zwischenablage. Perfekt für das schnelle Vorbereiten von Inhalten für Blogs oder Dokumentationen.",
+    "category": "Utility",
+    "tags": [
+      "Markdown",
+      "HTML",
+      "Convert"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/md_to_html.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Markdown zu HTML\nDescription: Konvertiert Markdown aus der Zwischenablage in HTML.\n\"\"\"\nimport subprocess\nimport re\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef md_converter():\n    try:\n        md_text = subprocess.check_output(['pbpaste'], text=True).strip()\n        if not md_text:\n            return \"Fehler: Zwischenablage ist leer.\"\n        \n        # Very simple conversion rules for basic MD\n        html = md_text\n        html = re.sub(r'^# (.*)', r'<h1>\\1</h1>', html, flags=re.M)\n        html = re.sub(r'^## (.*)', r'<h2>\\1</h2>', html, flags=re.M)\n        html = re.sub(r'\\*\\*(.*)\\*\\*', r'<strong>\\1</strong>', html)\n        html = re.sub(r'\\*(.*)\\*', r'<em>\\1</em>', html)\n        \n        subprocess.run(['pbcopy'], input=html.encode('utf-8'), check=False)\n        return \"Konvertiert und in Zwischenablage kopiert.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = md_converter()\n    notify(\"MD to HTML\", res)\n    print(res)\n"
+  },
+  {
+    "id": "pomodoro",
+    "name": "Pomodoro Timer",
+    "description": "Startet einen 25-Minuten Fokus-Timer.",
+    "long_description": "Maximiere deine Produktivität mit der Pomodoro-Technik. Dieses Skript startet einen 25-minütigen Arbeitsblock und sendet dir zu Beginn eine motivierende Benachrichtigung. Erinnere dich selbst daran, dich ohne Ablenkungen zu konzentrieren. (Tipp: Erstelle einen System-Shortcut, um den Timer noch schneller zu starten).",
+    "category": "Productivity",
+    "tags": [
+      "Focus",
+      "Timer",
+      "Productivity"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/pomodoro.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Pomodoro Timer\nDescription: Startet einen 25-Minuten Fokus-Timer.\n\"\"\"\nimport time\nimport subprocess\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef start_pomodoro():\n    notify(\"Pomodoro\", \"Timer gestartet: 25 Minuten Fokus!\")\n    # For a real script, this would run in background. \n    # Here we just simulate or advise.\n    # time.sleep(25 * 60)\n    # notify(\"Pomodoro\", \"Zeit um! Mach eine kurze Pause.\")\n    return \"Fokus-Session l\u00e4uft... (25 Min)\"\n\nif __name__ == \"__main__\":\n    res = start_pomodoro()\n    print(res)\n"
+  },
+  {
+    "id": "case_converter",
+    "name": "Text Case Converter",
+    "description": "Ändert Groß-/Kleinschreibung des Textes in der Zwischenablage.",
+    "long_description": "Kein lästiges Abtippen mehr. Dieses praktische Werkzeug ändert rotierend die Groß- und Kleinschreibung deines markierten Textes in der Zwischenablage. Es wechselt intelligent zwischen ALLES GROSS, alles klein und Wortanfänge Groß (Title Case). Ideal, um Texte schnell für Listen, Titel oder Programmierung anzupassen.",
+    "category": "Utility",
+    "tags": [
+      "Text",
+      "Utility",
+      "Formatter"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS"
+    ],
+    "script_path": "scripts/case_converter.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Text Case Converter\nDescription: \u00c4ndert Gro\u00df-/Kleinschreibung des Textes in der Zwischenablage.\n\"\"\"\nimport subprocess\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef cycle_case():\n    text = get_clipboard().strip()\n    if not text:\n        return \"Zwischenablage leer.\"\n    \n    if text.isupper():\n        new_text = text.lower()\n    elif text.islower():\n        new_text = text.title()\n    else:\n        new_text = text.upper()\n        \n    set_clipboard(new_text)\n    return f\"Ge\u00e4ndert zu: {new_text[:20]}...\"\n\nif __name__ == \"__main__\":\n    res = cycle_case()\n    print(res)\n"
+  },
+  {
+    "id": "ollama_git_commit",
+    "name": "Git Commit Generator (Ollama)",
+    "description": "Generiert eine Commit-Message aus einem git diff im Clipboard.",
+    "long_description": "Automatisiere deine Dokumentation. Kopiere das Ergebnis von `git diff` in deine Zwischenablage und starte dieses Skript. Die lokale KI analysiert deine Änderungen und schlägt eine präzise, professionelle Commit-Message nach dem 'Conventional Commits' Standard vor. Das spart Zeit und sorgt für ein sauberes Git-Log, ohne dass du selbst lange überlegen musst.",
+    "category": "Ollama",
+    "tags": [
+      "Git",
+      "Commit",
+      "AI"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_git_commit.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Git Commit Generator (Ollama)\nDescription: Generiert eine Commit-Message aus einem git diff im Clipboard.\n\"\"\"\nimport subprocess\nimport shutil\n\nMODEL = \"llama3.1\"\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef generate_commit():\n    if not shutil.which(\"ollama\"):\n        return \"Fehler: Ollama nicht gefunden.\"\n    \n    diff = get_clipboard().strip()\n    if not diff:\n        return \"Fehler: Kein Git Diff in der Zwischenablage.\"\n    \n    prompt = f\"Erzeuge eine professionelle, kurze Git Commit Message (Conventional Commits) basierend auf diesem Diff:\\n\\n{diff}\"\n    \n    try:\n        result = subprocess.run(['ollama', 'run', MODEL], input=prompt, capture_output=True, text=True, check=False)\n        msg = result.stdout.strip()\n        \n        if msg:\n            set_clipboard(msg)\n            return \"Commit Message generiert und kopiert.\"\n        return \"Keine Antwort erhalten.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = generate_commit()\n    notify(\"Git Commit\", res)\n    print(res)\n"
+  },
+  {
+    "id": "ollama_emojify",
+    "name": "Emoji Enhancer (Ollama)",
+    "description": "Fügt passende Emojis in den Clipboard-Text ein.",
+    "long_description": "Mache deine Texte lebendiger. Dieses Skript nutzt Ollama, um den Inhalt deiner Zwischenablage semantisch zu analysieren und an den passenden Stellen stimmige Emojis einzufügen. Der Originaltext bleibt dabei vollständig erhalten, wird aber optisch aufgewertet. Ideal für Social Media Posts, Teambotschaften oder um trockenen Texten etwas mehr Ausdruck zu verleihen.",
+    "category": "Ollama",
+    "tags": [
+      "Emoji",
+      "Text",
+      "AI"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_emojify.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Emoji Enhancer (Ollama)\nDescription: F\u00fcgt passende Emojis in den Clipboard-Text ein.\n\"\"\"\nimport subprocess\nimport shutil\n\nMODEL = \"llama3.1\"\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef emojify():\n    if not shutil.which(\"ollama\"):\n        return \"Fehler: Ollama nicht gefunden.\"\n    \n    text = get_clipboard().strip()\n    if not text:\n        return \"Fehler: Zwischenablage leer.\"\n    \n    prompt = f\"F\u00fcge passende Emojis in diesen Text ein, um ihn lebendiger zu machen. Behalte den Originaltext bei:\\n\\n{text}\"\n    \n    try:\n        result = subprocess.run(['ollama', 'run', MODEL], input=prompt, capture_output=True, text=True, check=False)\n        new_text = result.stdout.strip()\n        \n        if new_text:\n            set_clipboard(new_text)\n            return \"Emojis hinzugef\u00fcgt.\"\n        return \"Keine \u00c4nderung vorgenommen.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = emojify()\n    notify(\"Emojify\", res)\n    print(res)\n"
+  },
+  {
+    "id": "ollama_meeting_minutes",
+    "name": "Meeting Minutes (Ollama)",
+    "description": "Erstellt strukturierte Protokolle aus Notizen im Clipboard.",
+    "long_description": "Vom Chaos zur Struktur. Kopiere rohe Meeting-Notizen oder ein ungefiltertes Wortprotokoll in deine Zwischenablage. Das Skript nutzt lokale KI, um die wichtigsten Punkte zu extrahieren, Entscheidungen festzuhalten und eine klare Liste von Action Items zu erstellen. So hast du in Sekunden ein professionelles Protokoll fertig zum Verschicken.",
+    "category": "Ollama",
+    "tags": [
+      "Notes",
+      "Minutes",
+      "AI"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_meeting_minutes.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Meeting Minutes (Ollama)\nDescription: Erstellt strukturierte Protokolle aus Notizen im Clipboard.\n\"\"\"\nimport subprocess\nimport shutil\n\nMODEL = \"llama3.1\"\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef generate_minutes():\n    if not shutil.which(\"ollama\"):\n        return \"Fehler: Ollama nicht gefunden.\"\n    \n    notes = get_clipboard().strip()\n    if not notes:\n        return \"Fehler: Keine Notizen gefunden.\"\n    \n    prompt = f\"Erstelle ein strukturiertes Meeting-Protokoll aus diesen Notizen (Zusammenfassung, Entscheidungen, Action Items):\\n\\n{notes}\"\n    \n    try:\n        result = subprocess.run(['ollama', 'run', MODEL], input=prompt, capture_output=True, text=True, check=False)\n        minutes = result.stdout.strip()\n        \n        if minutes:\n            set_clipboard(minutes)\n            return \"Protokoll generiert.\"\n        return \"Fehler beim Generieren.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = generate_minutes()\n    notify(\"Meeting Minutes\", res)\n    print(res)\n"
+  },
+  {
+    "id": "ollama_docstring_gen",
+    "name": "Docstring Generator (Ollama)",
+    "description": "Generiert Python Docstrings für Code im Clipboard.",
+    "long_description": "Saubere Dokumentation ohne Aufwand. Kopiere eine Python-Funktion oder eine ganze Klasse und starte dieses Skript. Die KI analysiert Parameter, Rückgabewerte und die Logik deines Codes, um automatisch einen passenden Google-Style Docstring zu erstellen. Das Ergebnis landet direkt in deiner Zwischenablage – bereit, in deinen Code eingefügt zu werden.",
+    "category": "Ollama",
+    "tags": [
+      "Python",
+      "Docstring",
+      "AI"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_docstring_gen.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Docstring Generator (Ollama)\nDescription: Generiert Python Docstrings f\u00fcr Code im Clipboard.\n\"\"\"\nimport subprocess\nimport shutil\n\nMODEL = \"llama3.1\"\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef generate_docstring():\n    if not shutil.which(\"ollama\"):\n        return \"Fehler: Ollama nicht gefunden.\"\n    \n    code = get_clipboard().strip()\n    if not code:\n        return \"Fehler: Kein Code gefunden.\"\n    \n    prompt = f\"Generiere einen professionellen Google-Style Docstring f\u00fcr diesen Python Code:\\n\\n{code}\"\n    \n    try:\n        result = subprocess.run(['ollama', 'run', MODEL], input=prompt, capture_output=True, text=True, check=False)\n        docstring = result.stdout.strip()\n        \n        if docstring:\n            set_clipboard(docstring)\n            return \"Docstring generiert.\"\n        return \"Fehler.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = generate_docstring()\n    notify(\"Docstring Gen\", res)\n    print(res)\n"
+  },
+  {
+    "id": "ollama_bash_explainer",
+    "name": "Bash Explainer (Ollama)",
+    "description": "Erklärt komplexe Terminal-Befehle aus dem Clipboard.",
+    "long_description": "Nie wieder Angst vor dem Terminal. Kopiere einen kryptischen Einzeiler oder ein komplexes Shell-Skript und lass es dir von der KI Schritt für Schritt erklären. Das Skript erläutert die Bedeutung jedes Flags und Parameters in verständlichem Deutsch. Das perfekte Werkzeug für alle, die mehr über CLI-Tools lernen möchten, ohne jedes Mal die Man-Pages wälzen zu müssen.",
+    "category": "Ollama",
+    "tags": [
+      "Bash",
+      "Explainer",
+      "AI"
+    ],
+    "python_version": "3.10+",
+    "requires": [
+      "macOS",
+      "ollama"
+    ],
+    "script_path": "scripts/ollama_bash_explainer.py",
+    "code": "#!/usr/bin/env python3\n\"\"\"\nName: Bash Explainer (Ollama)\nDescription: Erkl\u00e4rt komplexe Terminal-Befehle aus dem Clipboard.\n\"\"\"\nimport subprocess\nimport shutil\n\nMODEL = \"llama3.1\"\n\ndef notify(title, message):\n    try:\n        subprocess.run(['osascript', '-e', f'display notification \"{message}\" with title \"{title}\"'], check=False)\n    except:\n        pass\n\ndef get_clipboard():\n    return subprocess.check_output(['pbpaste'], text=True)\n\ndef set_clipboard(text):\n    process = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)\n    process.communicate(text.encode('utf-8'))\n\ndef explain_bash():\n    if not shutil.which(\"ollama\"):\n        return \"Fehler: Ollama nicht gefunden.\"\n    \n    cmd = get_clipboard().strip()\n    if not cmd:\n        return \"Fehler: Kein Befehl gefunden.\"\n    \n    prompt = f\"Erkl\u00e4re kurz und verst\u00e4ndlich, was dieser Bash-Befehl macht:\\n\\n{cmd}\"\n    \n    try:\n        result = subprocess.run(['ollama', 'run', MODEL], input=prompt, capture_output=True, text=True, check=False)\n        explanation = result.stdout.strip()\n        \n        if explanation:\n            set_clipboard(explanation)\n            return \"Erkl\u00e4rung kopiert.\"\n        return \"Fehler.\"\n    except Exception as e:\n        return f\"Fehler: {e}\"\n\nif __name__ == \"__main__\":\n    res = explain_bash()\n    notify(\"Bash Explainer\", res)\n    print(res)\n"
+  }
+]
